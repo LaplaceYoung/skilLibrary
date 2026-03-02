@@ -1,0 +1,252 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand: var(--brand-color);
+
+  --color-bg-base: var(--bg-base);
+  --color-bg-panel: var(--bg-panel);
+  --color-bg-action: var(--bg-action);
+  --color-bg-action-hover: var(--bg-action-hover);
+
+  --color-border-main: var(--border-main);
+
+  --color-text-main: var(--text-main);
+  --color-text-muted: var(--text-muted);
+
+  --font-sans: var(--font-base);
+  --font-mono: var(--font-mono);
+
+  --radius-panel: var(--radius-base);
+  --radius-btn: var(--radius-button);
+}
+
+/* ----------------------------------------------------
+   THEME A: GEOMETRIC SILENCE (Hardcore Brutalism)
+---------------------------------------------------- */
+[data-theme="geometric"] {
+  --brand-color: #a5f3fc;
+  /* Cyan-ish white */
+
+  --bg-base: #000000;
+  --bg-panel: #050505;
+  --bg-action: #111111;
+  --bg-action-hover: #222222;
+
+  --border-main: #333333;
+
+  --text-main: #ffffff;
+  --text-muted: #888888;
+
+  --font-base: "IBM Plex Sans", "Inter", sans-serif;
+  --font-mono: "Fira Code", "JetBrains Mono", monospace;
+
+  /* No curves allowed */
+  --radius-base: 0px;
+  --radius-button: 0px;
+}
+
+/* ----------------------------------------------------
+   THEME B: CHROMATIC LANGUAGE (Retro Industrial)
+---------------------------------------------------- */
+[data-theme="chromatic"] {
+  --brand-color: #E2A746;
+  /* Amber */
+
+  --bg-base: #1C2329;
+  /* Navy Gray */
+  --bg-panel: #232C33;
+  --bg-action: #303A43;
+  --bg-action-hover: #3E4B56;
+
+  --border-main: #465561;
+
+  --text-main: #EAECEE;
+  --text-muted: #8B9FA8;
+
+  --font-base: "Helvetica Neue", "Arial", sans-serif;
+  --font-mono: "SF Mono", "Courier New", monospace;
+
+  --radius-base: 4px;
+  --radius-button: 2px;
+}
+
+/* ----------------------------------------------------
+   THEME C: ORGANIC SYSTEMS (Minimal Meditation)
+---------------------------------------------------- */
+[data-theme="organic"] {
+  --brand-color: #8C9982;
+  /* Sage Green */
+
+  --bg-base: #EFECE6;
+  /* Sand */
+  --bg-panel: #F7F5F0;
+  /* Light Sand */
+  --bg-action: #E4E0D7;
+  --bg-action-hover: #D7D2C7;
+
+  --border-main: #D5D1C5;
+
+  --text-main: #33312E;
+  --text-muted: #8C8881;
+
+  --font-base: "Outfit", "system-ui", sans-serif;
+  --font-mono: "ui-monospace", monospace;
+
+  /* Maximum Curves */
+  --radius-base: 24px;
+  --radius-button: 9999px;
+}
+
+:root {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-bg-base text-text-main font-sans selection:bg-brand/30 transition-colors duration-700;
+  margin: 0;
+  min-height: 100vh;
+}
+
+/* Consistent keyboard-visible focus ring across interactive controls. */
+:where(button, a, input, textarea, select, [role="button"], [role="option"]):focus-visible {
+  outline: 2px solid var(--brand-color);
+  outline-offset: 2px;
+}
+
+/* --- Optimized Scrollbar --- */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--brand-color) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--bg-action);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--bg-action-hover);
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+
+/* Reusable Themed Containers */
+.themed-panel {
+  @apply bg-bg-panel border border-border-main rounded-[calc(var(--radius-base))] transition-all duration-700;
+}
+
+.themed-action {
+  @apply bg-bg-action hover:bg-bg-action-hover border border-transparent hover:border-border-main rounded-[var(--radius-button)] transition-all duration-300;
+}
+
+.themed-input {
+  @apply bg-bg-base border border-border-main rounded-[calc(var(--radius-base))] focus:border-brand/50 focus:ring-1 focus:ring-brand/50 transition-all text-text-main;
+}
+
+/* Reusable UI semantics */
+.ui-kicker {
+  @apply text-xs font-bold uppercase tracking-widest text-text-muted;
+}
+
+.ui-caption {
+  @apply text-xs text-text-muted;
+}
+
+.ui-field-label {
+  @apply text-xs font-bold text-text-muted;
+}
+
+.ui-input {
+  @apply bg-bg-base border border-border-main rounded-[calc(var(--radius-base))] focus:border-brand/50 focus:ring-1 focus:ring-brand/50 transition-all text-text-main px-3 py-2 text-sm disabled:opacity-50;
+}
+
+.ui-btn-primary {
+  @apply inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-[var(--radius-button)] bg-brand hover:bg-brand/90 text-text-main font-bold shadow-lg shadow-brand/20 transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:hover:bg-brand;
+}
+
+.ui-btn-secondary {
+  @apply inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-[var(--radius-button)] bg-bg-action border border-border-main hover:bg-bg-panel text-text-main font-bold transition-all duration-200 active:scale-95 disabled:opacity-50;
+}
+
+.ui-icon-btn {
+  @apply inline-flex items-center justify-center p-1.5 rounded-[var(--radius-button)] transition-colors;
+}
+
+.ui-badge {
+  @apply inline-flex items-center gap-1 px-2 py-1 rounded-md border text-xs font-mono;
+}
+
+.ui-badge-success {
+  @apply text-green-400 bg-green-500/10 border-green-500/30;
+}
+
+.ui-badge-danger {
+  @apply text-red-400 bg-red-500/10 border-red-500/30;
+}
+
+.ui-badge-warning {
+  @apply text-amber-400 bg-amber-500/10 border-amber-500/30;
+}
+
+.ui-badge-attention {
+  @apply text-yellow-400 bg-yellow-500/10 border-yellow-500/30;
+}
+
+.ui-badge-info {
+  @apply text-purple-400 bg-purple-500/10 border-purple-500/20;
+}
+
+.ui-badge-brand {
+  @apply text-brand bg-brand/10 border-brand/20;
+}
+
+/* Prose Configuration for Markdown (Themed) */
+.prose {
+  @apply text-text-main leading-relaxed text-sm;
+}
+
+.prose h1,
+.prose h2,
+.prose h3 {
+  @apply text-text-main font-bold mt-6 mb-4;
+}
+
+.prose p {
+  @apply mb-4 text-text-muted;
+}
+
+.prose code {
+  @apply bg-bg-action px-1.5 py-0.5 rounded-[var(--radius-button)] text-brand font-mono text-xs;
+}
+
+.prose pre {
+  @apply bg-bg-base p-4 rounded-[var(--radius-base)] border border-border-main my-4 overflow-x-auto;
+}
+
+.prose pre code {
+  @apply bg-transparent p-0 text-text-main font-mono text-sm;
+}
+
+.prose ul,
+.prose ol {
+  @apply mb-4 pl-6 space-y-2 text-text-muted;
+}
+
+.prose li {
+  @apply list-disc;
+}
+
+.prose blockquote {
+  @apply border-l-4 border-brand/50 pl-4 py-1 italic text-text-muted bg-brand/5 rounded-r-[var(--radius-base)];
+}

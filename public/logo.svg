@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="none">
+    <rect width="256" height="256" rx="56" fill="#FFFFFF" fill-opacity="0.05" />
+    
+    <!-- Outer Spark -->
+    <path
+        d="M128 24C128 81.4376 81.4376 128 24 128C81.4376 128 128 174.562 128 232C128 174.562 174.562 128 232 128C174.562 128 128 81.4376 128 24Z"
+        fill="#FFFFFF"
+        fill-opacity="0.15"
+    />
+    
+    <!-- Inner Spark -->
+    <path
+        d="M128 56C128 95.7645 95.7645 128 56 128C95.7645 128 128 160.236 128 200C128 160.236 160.236 128 200 128C160.236 128 128 95.7645 128 56Z"
+        fill="#FFFFFF"
+    />
+    
+    <!-- Circuit Traces -->
+    <path
+        d="M44 44L84 84M212 212L172 172M212 44L172 84M44 212L84 172"
+        stroke="#FFFFFF"
+        stroke-width="12"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-opacity="0.4"
+    />
+    
+    <!-- Circuit Nodes -->
+    <circle cx="44" cy="44" r="8" fill="#FFFFFF" fill-opacity="0.6" />
+    <circle cx="212" cy="212" r="8" fill="#FFFFFF" fill-opacity="0.6" />
+    <circle cx="212" cy="44" r="8" fill="#FFFFFF" fill-opacity="0.6" />
+    <circle cx="44" cy="212" r="8" fill="#FFFFFF" fill-opacity="0.6" />
+    
+    <!-- Core dot -->
+    <circle cx="128" cy="128" r="8" fill="#FFFFFF" />
+</svg>
