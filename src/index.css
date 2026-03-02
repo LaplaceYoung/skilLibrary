@@ -37,8 +37,8 @@
   --text-main: #ffffff;
   --text-muted: #888888;
 
-  --font-base: "IBM Plex Sans", "Inter", sans-serif;
-  --font-mono: "Fira Code", "JetBrains Mono", monospace;
+  --font-base: "IBM Plex Sans", "Inter", "Segoe UI", "PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+  --font-mono: "JetBrains Mono", "Fira Code", "Cascadia Mono", "SFMono-Regular", "Consolas", "Sarasa Mono SC", monospace;
 
   /* No curves allowed */
   --radius-base: 0px;
@@ -63,8 +63,8 @@
   --text-main: #EAECEE;
   --text-muted: #8B9FA8;
 
-  --font-base: "Helvetica Neue", "Arial", sans-serif;
-  --font-mono: "SF Mono", "Courier New", monospace;
+  --font-base: "Helvetica Neue", "Segoe UI", "Arial", "PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+  --font-mono: "SF Mono", "JetBrains Mono", "Cascadia Mono", "Consolas", "Sarasa Mono SC", monospace;
 
   --radius-base: 4px;
   --radius-button: 2px;
@@ -89,8 +89,8 @@
   --text-main: #33312E;
   --text-muted: #8C8881;
 
-  --font-base: "Outfit", "system-ui", sans-serif;
-  --font-mono: "ui-monospace", monospace;
+  --font-base: "Outfit", "Inter", "Segoe UI", "PingFang SC", "Microsoft YaHei", "Noto Sans SC", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", "ui-monospace", "Cascadia Mono", "Consolas", "Sarasa Mono SC", monospace;
 
   /* Maximum Curves */
   --radius-base: 24px;
@@ -102,12 +102,21 @@
   --ui-ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
   --ui-duration-enter: 420ms;
   --ui-duration-fast: 180ms;
+  --ui-line-height-body: 1.6;
+  --ui-line-height-title: 1.2;
+  --ui-letter-normal: 0;
+  --ui-letter-tight: -0.01em;
+  --ui-letter-wide: 0.04em;
 }
 
 body {
   @apply bg-bg-base text-text-main font-sans selection:bg-brand/30 transition-colors duration-700;
   margin: 0;
   min-height: 100vh;
+  line-height: var(--ui-line-height-body);
+  letter-spacing: var(--ui-letter-normal);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
 }
 
 @keyframes ui-fade-up {
@@ -167,11 +176,13 @@ body {
 
 /* Reusable UI semantics */
 .ui-kicker {
-  @apply text-xs font-bold uppercase tracking-widest text-text-muted;
+  @apply text-[11px] font-semibold uppercase text-text-muted;
+  letter-spacing: 0.08em;
+  line-height: 1.25rem;
 }
 
 .ui-caption {
-  @apply text-xs text-text-muted;
+  @apply text-xs text-text-muted leading-5;
 }
 
 .ui-page-enter {
@@ -179,11 +190,30 @@ body {
 }
 
 .ui-field-label {
-  @apply text-xs font-bold text-text-muted;
+  @apply text-xs font-semibold text-text-muted leading-5;
+  letter-spacing: var(--ui-letter-wide);
+}
+
+.ui-page-title {
+  @apply text-3xl md:text-4xl font-bold text-text-main leading-tight;
+  letter-spacing: var(--ui-letter-tight);
+}
+
+.ui-page-subtitle {
+  @apply text-sm text-text-muted leading-6;
+}
+
+.ui-section-title {
+  @apply text-lg font-bold text-text-main leading-snug;
+  letter-spacing: -0.005em;
+}
+
+.ui-body-sm {
+  @apply text-sm text-text-muted leading-6;
 }
 
 .ui-input {
-  @apply bg-bg-base border border-border-main rounded-[calc(var(--radius-base))] focus:border-brand/50 focus:ring-1 focus:ring-brand/50 transition-all text-text-main px-3 py-2 text-sm disabled:opacity-50;
+  @apply bg-bg-base border border-border-main rounded-[calc(var(--radius-base))] focus:border-brand/50 focus:ring-1 focus:ring-brand/50 transition-all text-text-main px-3 py-2 text-sm leading-6 disabled:opacity-50;
 }
 
 .ui-btn-primary {
@@ -215,7 +245,7 @@ body {
 }
 
 .ui-badge {
-  @apply inline-flex items-center gap-1 px-2 py-1 rounded-md border text-xs font-mono;
+  @apply inline-flex items-center gap-1 px-2 py-1 rounded-md border text-xs font-mono leading-5;
 }
 
 .ui-badge-success {
@@ -243,7 +273,9 @@ body {
 }
 
 .ui-pill {
-  @apply inline-flex items-center gap-1 px-2 py-1 rounded-[var(--radius-button)] border text-xs font-bold uppercase tracking-widest;
+  @apply inline-flex items-center gap-1 px-2 py-1 rounded-[var(--radius-button)] border text-xs font-semibold uppercase;
+  letter-spacing: 0.06em;
+  line-height: 1.1;
 }
 
 .ui-pill-brand {

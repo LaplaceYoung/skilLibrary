@@ -65,8 +65,8 @@ export const Simulator: React.FC = () => {
     return (
         <div className="h-[calc(100vh-64px)] flex flex-col ui-page-enter gap-6">
             <div className="space-y-1">
-                <h2 className="text-3xl font-bold tracking-tight text-text-main">{t('simulator.title')}</h2>
-                <p className="text-text-muted text-sm">{t('simulator.subtitle')}</p>
+                <h2 className="ui-page-title">{t('simulator.title')}</h2>
+                <p className="ui-page-subtitle">{t('simulator.subtitle')}</p>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 flex-1 min-h-0">
@@ -109,7 +109,7 @@ export const Simulator: React.FC = () => {
                                             </span>
                                         ))
                                     ) : (
-                                        <span className="text-text-muted italic opacity-50">{t('simulator.fullAccessMode')}</span>
+                                        <span className="ui-caption italic opacity-70">{t('simulator.fullAccessMode')}</span>
                                     )}
                                 </div>
                             </div>
@@ -133,7 +133,7 @@ export const Simulator: React.FC = () => {
                             <Terminal className="w-4 h-4" />
                             <span className="ui-kicker text-brand">{t('simulator.statusLabel')}</span>
                         </div>
-                        <p className="text-xs text-text-muted">
+                        <p className="ui-caption">
                             {messages.length > 0 ? t('simulator.statusActive') : t('simulator.statusWaiting')}
                         </p>
                     </div>
@@ -220,7 +220,7 @@ export const Simulator: React.FC = () => {
                                                         </ReactMarkdown>
                                                     </div>
                                                 ) : (
-                                                    <p className="text-sm font-medium">{message.content}</p>
+                                                    <p className="text-sm font-medium leading-6">{message.content}</p>
                                                 )}
                                             </div>
                                         </div>
@@ -246,7 +246,7 @@ export const Simulator: React.FC = () => {
                                     value={input}
                                     onChange={(event) => setInput(event.target.value)}
                                     placeholder={t('simulator.inputPlaceholder')}
-                                    className="flex-1 bg-transparent border-none focus:outline-none text-text-main px-4 placeholder:text-text-muted"
+                                    className="flex-1 bg-transparent border-none focus:outline-none text-text-main text-sm leading-6 px-4 placeholder:text-text-muted"
                                 />
                                 <button
                                     type="submit"

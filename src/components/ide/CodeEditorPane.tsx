@@ -43,7 +43,7 @@ export const CodeEditorPane: React.FC<CodeEditorPaneProps> = ({ filename, initia
         <div className="h-full flex flex-col pt-4">
             <div className="flex items-center justify-between mb-4 px-6 shrink-0">
                 <div className="flex items-center gap-3">
-                    <h2 className="text-xl font-bold font-mono tracking-tight text-text-main">{filename}</h2>
+                    <h2 className="text-xl font-bold font-mono leading-7 tracking-[-0.01em] text-text-main">{filename}</h2>
                     {isModified && <div className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />}
                 </div>
 
@@ -61,7 +61,7 @@ export const CodeEditorPane: React.FC<CodeEditorPaneProps> = ({ filename, initia
                 <textarea
                     value={content}
                     onChange={(e) => setContent(e.target.value)}
-                    className="absolute inset-0 w-full h-full bg-transparent text-text-main p-6 font-mono text-sm resize-none focus:outline-none focus:ring-1 focus:ring-brand/30 z-10 custom-scrollbar"
+                    className="absolute inset-0 w-full h-full bg-transparent text-text-main p-6 font-mono text-sm leading-6 resize-none focus:outline-none focus:ring-1 focus:ring-brand/30 z-10 custom-scrollbar"
                     placeholder="Type raw code or markdown here..."
                     spellCheck={false}
                 />

@@ -627,8 +627,8 @@ echo "Installed ${safeSkillFolder} into $TARGET_DIR"
         <div className="space-y-8 ui-page-enter">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h2 className="text-4xl font-extrabold tracking-tight text-text-main mb-2">Skill Library</h2>
-                    <p className="text-text-muted">Discover, review, and deploy skills with security visibility.</p>
+                    <h2 className="ui-page-title mb-2">Skill Library</h2>
+                    <p className="ui-page-subtitle">Discover, review, and deploy skills with security visibility.</p>
                 </div>
                 <div className="flex items-center gap-3">
                     {dirHandle && (
@@ -711,11 +711,11 @@ echo "Installed ${safeSkillFolder} into $TARGET_DIR"
             {activeTab === 'discover' && isFetchingAwesome ? (
                 <div className="themed-panel h-64 flex flex-col items-center justify-center border-dashed">
                     <div className="w-8 h-8 rounded-full border-2 border-brand border-t-transparent animate-spin mb-4" />
-                    <p className="text-text-muted text-lg tracking-widest font-mono">Loading discover feeds...</p>
+                    <p className="ui-kicker font-mono">Loading discover feeds...</p>
                 </div>
             ) : filteredSkills.length === 0 ? (
                 <div className="themed-panel h-64 flex flex-col items-center justify-center border-dashed">
-                    <p className="text-text-muted text-lg mb-4">No skills found.</p>
+                    <p className="text-text-muted text-lg leading-7 mb-4">No skills found.</p>
                     <button
                         onClick={() => setSearchTerm('')}
                         className="text-brand hover:text-text-main transition-colors underline underline-offset-4"
@@ -839,7 +839,7 @@ echo "Installed ${safeSkillFolder} into $TARGET_DIR"
                                     </div>
                                 </div>
 
-                                <p className="text-text-muted text-sm leading-relaxed mb-6 line-clamp-3 flex-1 relative z-10">
+                                <p className="ui-body-sm mb-6 line-clamp-3 flex-1 relative z-10">
                                     {skill.description || 'No description.'}
                                 </p>
 
@@ -882,7 +882,7 @@ echo "Installed ${safeSkillFolder} into $TARGET_DIR"
                                             {skill.tags.slice(0, 3).map((tag) => (
                                                 <span
                                                     key={tag}
-                                                    className="ui-badge ui-badge-brand uppercase tracking-wider"
+                                                    className="ui-badge ui-badge-brand uppercase"
                                                 >
                                                     <Hash className="w-3 h-3" />
                                                     {tag}
@@ -896,7 +896,7 @@ echo "Installed ${safeSkillFolder} into $TARGET_DIR"
                                         </div>
                                     )}
 
-                                    <div className="flex items-center justify-between text-xs text-text-muted">
+                                    <div className="flex items-center justify-between ui-caption">
                                         <span className="flex items-center gap-1.5">
                                             <Clock className="w-3.5 h-3.5" />
                                             {activeTab === 'local'

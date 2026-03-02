@@ -105,8 +105,8 @@ export const Settings: React.FC = () => {
     return (
         <div className="space-y-6 ui-page-enter max-w-2xl">
             <div className="space-y-1">
-                <h2 className="text-3xl font-bold tracking-tight text-text-main">System Settings</h2>
-                <p className="text-text-muted text-sm">Manage local sync, appearance, and MCP integration.</p>
+                <h2 className="ui-page-title">System Settings</h2>
+                <p className="ui-page-subtitle">Manage local sync, appearance, and MCP integration.</p>
             </div>
 
             <div className="space-y-4">
@@ -117,8 +117,8 @@ export const Settings: React.FC = () => {
                             <FolderSync className="w-6 h-6" />
                         </div>
                         <div className="flex-1">
-                            <h3 className="text-lg font-bold text-text-main mb-1">Local File System</h3>
-                            <p className="text-sm text-text-muted mb-4 leading-relaxed">
+                            <h3 className="ui-section-title mb-1">Local File System</h3>
+                            <p className="ui-body-sm mb-4">
                                 Grant read/write permission to your local skills directory for direct synchronization.
                             </p>
 
@@ -127,7 +127,7 @@ export const Settings: React.FC = () => {
                                     <div className="flex-1 bg-black/40 border border-green-500/20 rounded-xl p-3 flex items-center justify-between">
                                         <div className="flex items-center gap-2">
                                             <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                                            <span className="text-sm font-mono text-green-400">{dirHandle.name} linked</span>
+                                            <span className="text-sm leading-6 font-mono text-green-400">{dirHandle.name} linked</span>
                                         </div>
                                         <button
                                             onClick={() => void syncFromLocal()}
@@ -163,8 +163,8 @@ export const Settings: React.FC = () => {
                         <HardDrive className="w-6 h-6" />
                     </div>
                     <div className="flex-1">
-                        <h3 className="text-lg font-bold text-text-main mb-1">Local Storage</h3>
-                        <p className="text-sm text-text-muted mb-4 leading-relaxed">
+                        <h3 className="ui-section-title mb-1">Local Storage</h3>
+                        <p className="ui-body-sm mb-4">
                             All skill metadata and UI settings are stored locally in your browser.
                         </p>
                         <button
@@ -187,8 +187,8 @@ export const Settings: React.FC = () => {
                             <Brush className="w-6 h-6" />
                         </div>
                         <div className="flex-1">
-                            <h3 className="text-lg font-bold text-text-main mb-1">Appearance Theme</h3>
-                            <p className="text-sm text-text-muted mb-4 leading-relaxed">
+                            <h3 className="ui-section-title mb-1">Appearance Theme</h3>
+                            <p className="ui-body-sm mb-4">
                                 Switch theme tokens and the generated p5 background behavior.
                             </p>
 
@@ -201,7 +201,7 @@ export const Settings: React.FC = () => {
                                             : 'border-border-main hover:border-text-muted bg-bg-base/50'
                                     }`}
                                 >
-                                    <div className="font-mono text-sm font-bold text-text-main mb-2">Geometric Silence</div>
+                                    <div className="text-sm font-bold text-text-main leading-6 mb-2">Geometric Silence</div>
                                     <div className="ui-caption leading-tight">Minimal grid and restrained motion.</div>
                                 </button>
 
@@ -213,7 +213,7 @@ export const Settings: React.FC = () => {
                                             : 'border-border-main hover:border-text-muted bg-bg-base/50'
                                     }`}
                                 >
-                                    <div className="font-sans text-sm font-bold text-text-main mb-2">Chromatic Language</div>
+                                    <div className="text-sm font-bold text-text-main leading-6 mb-2">Chromatic Language</div>
                                     <div className="ui-caption leading-tight">Color interaction and harmonic waves.</div>
                                 </button>
 
@@ -225,7 +225,7 @@ export const Settings: React.FC = () => {
                                             : 'border-border-main hover:border-text-muted bg-bg-base/50'
                                     }`}
                                 >
-                                    <div className="font-sans text-sm font-bold text-text-main mb-2">Organic Systems</div>
+                                    <div className="text-sm font-bold text-text-main leading-6 mb-2">Organic Systems</div>
                                     <div className="ui-caption leading-tight">Branch-like growth and softer rhythm.</div>
                                 </button>
                             </div>
@@ -238,8 +238,8 @@ export const Settings: React.FC = () => {
                         <Languages className="w-6 h-6" />
                     </div>
                     <div className="flex-1">
-                        <h3 className="text-lg font-bold text-text-main mb-1">{t('settings.language.title')}</h3>
-                        <p className="text-sm text-text-muted mb-4 leading-relaxed">{t('settings.language.description')}</p>
+                        <h3 className="ui-section-title mb-1">{t('settings.language.title')}</h3>
+                        <p className="ui-body-sm mb-4">{t('settings.language.description')}</p>
                         <div className="max-w-xs">
                             <label className="ui-field-label">{t('settings.language.label')}</label>
                             <div className="mt-2">
@@ -262,8 +262,8 @@ export const Settings: React.FC = () => {
                             <Zap className="w-6 h-6" />
                         </div>
                         <div className="flex-1">
-                            <h3 className="text-lg font-bold text-text-main mb-1">MCP Integration</h3>
-                            <p className="text-sm text-text-muted mb-4 leading-relaxed">
+                            <h3 className="ui-section-title mb-1">MCP Integration</h3>
+                            <p className="ui-body-sm mb-4">
                                 Connect to a local MCP proxy endpoint. Run the proxy with <code>npm run mcp</code>.
                             </p>
 
@@ -322,7 +322,7 @@ export const Settings: React.FC = () => {
                                         <div className="flex items-center gap-4">
                                             <div className="flex-1 bg-black/40 border border-green-500/20 rounded-xl p-3 flex items-center gap-3">
                                                 <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                                                <span className="text-sm font-bold text-green-400">MCP proxy connected</span>
+                                                <span className="text-sm leading-6 font-bold text-green-400">MCP proxy connected</span>
                                                 <span className="ui-caption font-mono text-green-500/80 ml-auto">
                                                     {tools.length} tools loaded
                                                 </span>

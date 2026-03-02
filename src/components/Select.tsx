@@ -200,7 +200,7 @@ export const Select: React.FC<SelectProps> = ({
                 onClick={() => (menuOpen ? closeMenu() : openMenu())}
                 onKeyDown={handleTriggerKeyDown}
             >
-                <span className={cn('block truncate font-medium', !selectedOption && 'text-text-muted font-normal')}>
+                <span className={cn('block truncate font-medium leading-6', !selectedOption && 'text-text-muted font-normal')}>
                     {selectedOption ? selectedOption.label : effectivePlaceholder}
                 </span>
                 <ChevronDown className={cn('w-5 h-5 text-text-muted transition-transform duration-300', menuOpen && 'rotate-180')} />
@@ -216,7 +216,7 @@ export const Select: React.FC<SelectProps> = ({
                     className="absolute z-[100] w-full mt-2 bg-bg-panel border border-border-main rounded-[calc(var(--radius-base))] shadow-2xl py-1.5 animate-in fade-in slide-in-from-top-2 duration-300 max-h-60 overflow-auto custom-scrollbar"
                 >
                     {options.length === 0 ? (
-                        <div className="px-4 py-3 text-sm text-text-muted text-center cursor-default">{t('select.noOptions')}</div>
+                        <div className="px-4 py-3 text-sm leading-6 text-text-muted text-center cursor-default">{t('select.noOptions')}</div>
                     ) : (
                         options.map((option, index) => (
                             <button
@@ -229,7 +229,7 @@ export const Select: React.FC<SelectProps> = ({
                                 aria-selected={value === option.value}
                                 tabIndex={effectiveHighlightedIndex === index ? 0 : -1}
                                 className={cn(
-                                    'flex w-[calc(100%-0.75rem)] mx-1.5 items-center justify-between px-4 py-2.5 rounded-[calc(var(--radius-base)*0.75)] cursor-pointer transition-colors text-sm text-left',
+                                    'flex w-[calc(100%-0.75rem)] mx-1.5 items-center justify-between px-4 py-2.5 rounded-[calc(var(--radius-base)*0.75)] cursor-pointer transition-colors text-sm leading-6 text-left',
                                     value === option.value
                                         ? 'bg-brand/10 text-brand font-bold'
                                         : effectiveHighlightedIndex === index

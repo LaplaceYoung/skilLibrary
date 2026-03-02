@@ -83,7 +83,7 @@ const FileTreeNode: React.FC<{
                 {getIcon()}
 
                 <span className={cn(
-                    "text-sm truncate",
+                    "text-sm leading-6 truncate",
                     isSelected ? "font-bold text-text-main" : "text-text-muted group-hover:text-text-main"
                 )}>
                     {node.name}

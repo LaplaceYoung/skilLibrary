@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useSkillStore, type Skill } from '../store';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, Save, FolderPlus, FilePlus } from 'lucide-react';
@@ -27,6 +27,27 @@ function getErrorMessage(error: unknown): string {
 }
 
 const DEFAULT_INSTRUCTIONS = '# New skill\n\nDefine the behavior and operating constraints of this skill.';
+const createInitialFormData = (): Partial<Skill> => ({
+    name: '',
+    description: '',
+    author: 'Agent Skill Forge',
+    tags: [],
+    disableModelInvocation: false,
+    userInvocable: true,
+    allowedTools: [],
+    context: 'none',
+    agent: '',
+    instructions: DEFAULT_INSTRUCTIONS
+});
+
+const createVirtualSkillTree = (): FileNode[] => [
+    {
+        name: 'SKILL.md',
+        isDir: false,
+        handle: null,
+        path: 'SKILL.md'
+    }
+];
 
 export const SkillEditor: React.FC = () => {
     const {
@@ -52,23 +73,22 @@ export const SkillEditor: React.FC = () => {
 
     // SKILL.md state
     const [activeTab, setActiveTab] = useState<'meta' | 'instructions' | 'preview'>('meta');
-    const [formData, setFormData] = useState<Partial<Skill>>({
-        name: '',
-        description: '',
-        author: 'Agent Skill Forge',
-        tags: [],
-        disableModelInvocation: false,
-        userInvocable: true,
-        allowedTools: [],
-        context: 'none',
-        agent: '',
-        instructions: DEFAULT_INSTRUCTIONS
-    });
+    const [formData, setFormData] = useState<Partial<Skill>>(() => createInitialFormData());
     const [createEntryType, setCreateEntryType] = useState<'file' | 'folder' | null>(null);
     const [newEntryName, setNewEntryName] = useState('');
+    const previousEditIdRef = useRef<string | null>(editId);
 
     useEffect(() => {
+        const wasEditing = previousEditIdRef.current !== null;
+        previousEditIdRef.current = editId;
+
         const init = async () => {
+            setSkillDirHandle(null);
+            setFileTree(createVirtualSkillTree());
+            setActiveFilePath('SKILL.md');
+            setActiveFileHandle(null);
+            setSubFileContent('');
+
             if (editId) {
                 const existing = skills.find((skill) => skill.id === editId);
                 if (!existing) return;
@@ -81,7 +101,7 @@ export const SkillEditor: React.FC = () => {
                     const skillDir = await dirHandle.getDirectoryHandle(getSafeSkillDirName(existing.name));
                     setSkillDirHandle(skillDir);
                     const tree = await readSkillTree(skillDir);
-                    setFileTree(tree);
+                    setFileTree(tree.length > 0 ? tree : createVirtualSkillTree());
 
                     const skillMdNode = tree.find((node) => node.name === 'SKILL.md' && !node.isDir);
                     if (skillMdNode?.handle && skillMdNode.handle.kind === 'file') {
@@ -93,9 +113,9 @@ export const SkillEditor: React.FC = () => {
                 return;
             }
 
-            if (dirHandle) {
-                // Virtual root file before the first save creates a physical directory.
-                setFileTree([{ name: 'SKILL.md', isDir: false, handle: null, path: 'SKILL.md' }]);
+            if (wasEditing) {
+                setFormData(createInitialFormData());
+                setActiveTab('meta');
             }
         };
 
@@ -103,9 +123,16 @@ export const SkillEditor: React.FC = () => {
     }, [dirHandle, editId, skills]);
 
     const handleFileSelect = async (node: FileNode) => {
-        if (node.isDir || !node.handle || node.handle.kind !== 'file') return;
+        if (node.isDir) return;
 
         setActiveFilePath(node.path);
+        setSubFileContent('');
+
+        if (!node.handle || node.handle.kind !== 'file') {
+            setActiveFileHandle(null);
+            return;
+        }
+
         setActiveFileHandle(node.handle);
 
         if (node.name === 'SKILL.md') return;
@@ -338,8 +365,13 @@ export const SkillEditor: React.FC = () => {
         }
     };
 
-    const isV4ModeActive = Boolean(dirHandle && (skillDirHandle || !editId));
     const isEditingSkillMd = activeFilePath === 'SKILL.md' || activeFilePath?.endsWith('/SKILL.md');
+    const workspaceHint = !dirHandle
+        ? 'Link a local folder to enable persistent multi-file workspace.'
+        : !skillDirHandle
+            ? 'Save the skill once to create its on-disk workspace and enable sidecar file creation.'
+            : null;
+    const statusLabel = skillDirHandle ? 'IDE Workspace' : 'IDE Preview';
 
     return (
         <div className="space-y-4 ui-page-enter h-[calc(100vh-64px)] flex flex-col">
@@ -353,22 +385,20 @@ export const SkillEditor: React.FC = () => {
                     </button>
                     <div>
                         <div className="flex items-center gap-3">
-                            <h2 className="text-3xl font-bold text-text-main tracking-tight">
+                            <h2 className="ui-page-title">
                                 {formData.name || (editId ? 'Edit Skill' : 'Create Skill')}
                             </h2>
-                            {isV4ModeActive && (
-                                <span className="ui-pill ui-pill-brand">
-                                    IDE Enabled
-                                </span>
-                            )}
+                            <span className={`ui-pill ${skillDirHandle ? 'ui-pill-brand' : 'ui-pill-warning'}`}>
+                                {statusLabel}
+                            </span>
                         </div>
-                        <p className="text-sm text-text-muted">
+                        <p className="ui-page-subtitle">
                             Edit frontmatter, instructions, and optional sidecar files.
                         </p>
                     </div>
                 </div>
 
-                {(!isV4ModeActive || isEditingSkillMd) && (
+                {isEditingSkillMd && (
                     <button
                         onClick={handleSaveSkillMd}
                         className="ui-btn-primary px-6"
@@ -380,38 +410,38 @@ export const SkillEditor: React.FC = () => {
             </div>
 
             <div className="flex-1 flex gap-4 min-h-0">
-                {isV4ModeActive && (
-                    <div className="w-64 themed-panel flex flex-col overflow-hidden shrink-0">
-                        <div className="p-4 border-b border-border-main flex justify-between items-center bg-bg-base/50">
-                            <span className="ui-kicker">Files</span>
-                            <div className="flex gap-1">
-                                <button
-                                    onClick={() => openCreateDialog(false)}
-                                    className="ui-icon-btn text-text-muted hover:text-text-main hover:bg-bg-action"
-                                    title="New file"
-                                >
-                                    <FilePlus className="w-4 h-4" />
-                                </button>
-                                <button
-                                    onClick={() => openCreateDialog(true)}
-                                    className="ui-icon-btn text-text-muted hover:text-text-main hover:bg-bg-action"
-                                    title="New folder"
-                                >
-                                    <FolderPlus className="w-4 h-4" />
-                                </button>
-                            </div>
-                        </div>
-                        <div className="flex-1 overflow-y-auto custom-scrollbar p-2">
-                            <FileExplorer nodes={fileTree} activePath={activeFilePath} onSelect={handleFileSelect} />
+                <div className="w-64 themed-panel flex flex-col overflow-hidden shrink-0">
+                    <div className="p-4 border-b border-border-main flex justify-between items-center bg-bg-base/50">
+                        <span className="ui-kicker">Files</span>
+                        <div className="flex gap-1">
+                            <button
+                                onClick={() => openCreateDialog(false)}
+                                disabled={!skillDirHandle}
+                                className="ui-icon-btn text-text-muted hover:text-text-main hover:bg-bg-action disabled:opacity-40 disabled:cursor-not-allowed"
+                                title="New file"
+                            >
+                                <FilePlus className="w-4 h-4" />
+                            </button>
+                            <button
+                                onClick={() => openCreateDialog(true)}
+                                disabled={!skillDirHandle}
+                                className="ui-icon-btn text-text-muted hover:text-text-main hover:bg-bg-action disabled:opacity-40 disabled:cursor-not-allowed"
+                                title="New folder"
+                            >
+                                <FolderPlus className="w-4 h-4" />
+                            </button>
                         </div>
                     </div>
-                )}
+                    <div className="flex-1 overflow-y-auto custom-scrollbar p-2">
+                        <FileExplorer nodes={fileTree} activePath={activeFilePath} onSelect={handleFileSelect} />
+                    </div>
+                </div>
 
                 <div className="flex-1 themed-panel overflow-hidden relative flex flex-col min-w-0">
-                    {!dirHandle && (
+                    {workspaceHint && (
                         <div className="absolute top-4 right-4 z-50 pointer-events-none opacity-60">
                             <span className="ui-pill ui-pill-warning">
-                                Classic mode. Link a folder to enable multi-file IDE.
+                                {workspaceHint}
                             </span>
                         </div>
                     )}
@@ -447,10 +477,10 @@ export const SkillEditor: React.FC = () => {
                         aria-labelledby="create-entry-title"
                         className="relative z-10 w-full max-w-md themed-panel p-6"
                     >
-                        <h3 id="create-entry-title" className="text-lg font-bold text-text-main mb-2">
+                        <h3 id="create-entry-title" className="ui-section-title mb-2">
                             New {createEntryType}
                         </h3>
-                        <p className="text-sm text-text-muted mb-4">
+                        <p className="ui-body-sm mb-4">
                             Enter a {createEntryType} name to create it inside the current skill workspace.
                         </p>
 
@@ -486,4 +516,5 @@ export const SkillEditor: React.FC = () => {
         </div>
     );
 };
+
 

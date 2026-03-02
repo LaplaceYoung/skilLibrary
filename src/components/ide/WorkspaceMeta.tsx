@@ -27,7 +27,7 @@ export const WorkspaceMeta: React.FC<WorkspaceMetaProps> = ({ formData, setFormD
                     value={formData.name || ''}
                     onChange={e => setFormData(prev => ({ ...prev, name: e.target.value }))}
                     placeholder="例如：前端架构专家"
-                    className="w-full ui-input px-4 py-3 font-mono"
+                    className="w-full ui-input px-4 py-3 font-mono leading-6"
                     id="skill-name-input"
                 />
             </div>
@@ -38,7 +38,7 @@ export const WorkspaceMeta: React.FC<WorkspaceMetaProps> = ({ formData, setFormD
                     value={formData.description || ''}
                     onChange={e => setFormData(prev => ({ ...prev, description: e.target.value }))}
                     placeholder="在这里简要描述这项技能的作用..."
-                    className="w-full ui-input px-4 py-3 h-24 resize-none"
+                    className="w-full ui-input px-4 py-3 h-24 resize-none leading-6"
                     id="skill-desc-input"
                 />
             </div>
@@ -68,12 +68,12 @@ export const WorkspaceMeta: React.FC<WorkspaceMetaProps> = ({ formData, setFormD
             </div>
 
             <div className="h-px bg-border-main my-6"></div>
-            <h3 className="text-lg font-bold text-text-main mb-4">Claude 执行沙箱环境配置</h3>
+            <h3 className="ui-section-title mb-4">Claude 执行沙箱环境配置</h3>
 
             <div className="grid grid-cols-2 gap-6">
                 <div className="p-4 bg-bg-action rounded-[calc(var(--radius-base))] border border-border-main space-y-1 hover:border-brand/30 transition-colors">
                     <div className="flex items-center justify-between">
-                        <label className="text-sm font-bold text-text-main">禁用模型自动调用</label>
+                        <label className="text-sm leading-6 font-semibold text-text-main">禁用模型自动调用</label>
                         <input
                             type="checkbox"
                             checked={formData.disableModelInvocation || false}
@@ -87,7 +87,7 @@ export const WorkspaceMeta: React.FC<WorkspaceMetaProps> = ({ formData, setFormD
 
                 <div className="p-4 bg-bg-action rounded-[var(--radius-base)] border border-border-main space-y-1 hover:border-brand/30 transition-colors">
                     <div className="flex items-center justify-between">
-                        <label className="text-sm font-bold text-text-main">允许用户主动调用</label>
+                        <label className="text-sm leading-6 font-semibold text-text-main">允许用户主动调用</label>
                         <input
                             type="checkbox"
                             checked={formData.userInvocable !== false}
@@ -107,7 +107,7 @@ export const WorkspaceMeta: React.FC<WorkspaceMetaProps> = ({ formData, setFormD
                     value={formData.allowedTools?.join(', ') || ''}
                     onChange={handleToolsChange}
                     placeholder="例如: Read, Grep, Bash, Glob (留空则允许全部)"
-                    className="w-full ui-input px-4 py-3 font-mono text-sm"
+                    className="w-full ui-input px-4 py-3 font-mono text-sm leading-6"
                     id="allowed-tools-input"
                 />
                 <p className="ui-caption">使用逗号分隔指定 Claude 运行此技能时可以使用的沙箱工具。</p>
@@ -134,7 +134,7 @@ export const WorkspaceMeta: React.FC<WorkspaceMetaProps> = ({ formData, setFormD
                         onChange={e => setFormData(prev => ({ ...prev, agent: e.target.value }))}
                         placeholder="例如: Explore, Plan (选填)"
                         disabled={formData.context !== 'fork'}
-                        className="w-full ui-input px-4 py-3 disabled:opacity-30 font-mono text-sm"
+                        className="w-full ui-input px-4 py-3 disabled:opacity-30 font-mono text-sm leading-6"
                         id="agent-input"
                     />
                     <p className="ui-caption">当跨进程隔离执行时，指定由哪个系统代理接管任务。</p>

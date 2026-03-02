@@ -27,10 +27,10 @@ export const Sidebar: React.FC = () => {
                     <Logo className="w-6 h-6 text-brand" />
                 </div>
                 <div>
-                    <h1 className="text-lg font-bold text-text-main leading-none">
+                    <h1 className="text-lg font-bold text-text-main leading-tight tracking-[-0.01em]">
                         Skill Forge
                     </h1>
-                    <p className="ui-kicker font-mono mt-1">AI Agent Tools</p>
+                    <p className="ui-kicker mt-1">AI Agent Tools</p>
                 </div>
             </div>
 
@@ -52,7 +52,7 @@ export const Sidebar: React.FC = () => {
                                     "w-5 h-5 transition-transform duration-300 group-hover:scale-110",
                                     isActive ? 'text-brand' : 'group-hover:text-text-main'
                                 )} />
-                                <span>{item.label}</span>
+                                <span className="text-sm leading-6">{item.label}</span>
                             </>
                         )}
                     </NavLink>
@@ -64,9 +64,9 @@ export const Sidebar: React.FC = () => {
                     <div className="themed-panel p-4 border-green-500/20 bg-green-500/5 text-center">
                         <div className="flex items-center justify-center gap-1 mb-1">
                             <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                            <p className="text-xs text-green-400 font-bold uppercase tracking-wider">System Linked</p>
+                            <p className="ui-kicker text-green-400">System Linked</p>
                         </div>
-                        <p className="text-xs text-text-muted font-mono truncate px-2">{dirHandle.name}</p>
+                        <p className="ui-caption font-mono truncate px-2">{dirHandle.name}</p>
                     </div>
                 ) : (
                     <button
@@ -76,9 +76,9 @@ export const Sidebar: React.FC = () => {
                     >
                         <div className="flex items-center justify-center gap-1 mb-1">
                             <Unlink className="w-3 h-3 text-brand" />
-                            <p className="text-xs text-brand font-bold uppercase tracking-wider">Local Only</p>
+                            <p className="ui-kicker text-brand">Local Only</p>
                         </div>
-                        <p className="text-xs text-text-muted group-hover:text-brand transition-colors">Click to link system dir</p>
+                        <p className="ui-caption group-hover:text-brand transition-colors">Click to link system dir</p>
                     </button>
                 )}
             </div>
