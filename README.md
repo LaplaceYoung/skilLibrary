@@ -1,3 +1,6 @@
+<p align="center">
+  <img src="./public/logo.svg" alt="Agent Skill Forge Logo" width="120">
+</p>
 # Agent Skill Forge
 
 <p align="center">
@@ -11,7 +14,7 @@
   <img alt="Vite" src="https://img.shields.io/badge/vite-7.x-646cff.svg">
 </p>
 
-English | [¼òÌåÖÐÎÄ](./README.zh-CN.md)
+English | [Chinese](./README.zh-CN.md)
 
 ## Table of Contents
 
@@ -135,20 +138,20 @@ Then configure in app settings:
 
 ```text
 .
-©À©¤ docs/                 # docs index, plans, notes, repository checklist
-©À©¤ mcp-proxy/            # local MCP bridge service
-©À©¤ public/               # static assets and skill catalog
-©À©¤ scripts/              # maintenance scripts
-©À©¤ src/
-©¦  ©À©¤ components/        # shared UI and IDE components
-©¦  ©¦  ©¸©¤ ide/            # file explorer and code pane
-©¦  ©À©¤ pages/             # Library / SkillEditor / Simulator / Settings
-©¦  ©À©¤ lib/               # fs, validation, compliance, security, indexing
-©¦  ©À©¤ store/             # app and MCP state stores
-©¦  ©¸©¤ i18n/              # locale messages
-©À©¤ CONTRIBUTING.md
-©À©¤ LICENSE
-©¸©¤ README*.md
+â”œâ”€ docs/                 # docs index, plans, notes, repository checklist
+â”œâ”€ mcp-proxy/            # local MCP bridge service
+â”œâ”€ public/               # static assets and skill catalog
+â”œâ”€ scripts/              # maintenance scripts
+â”œâ”€ src/
+â”‚  â”œâ”€ components/        # shared UI and IDE components
+â”‚  â”‚  â””â”€ ide/            # file explorer and code pane
+â”‚  â”œâ”€ pages/             # Library / SkillEditor / Simulator / Settings
+â”‚  â”œâ”€ lib/               # fs, validation, compliance, security, indexing
+â”‚  â”œâ”€ store/             # app and MCP state stores
+â”‚  â””â”€ i18n/              # locale messages
+â”œâ”€ CONTRIBUTING.md
+â”œâ”€ LICENSE
+â””â”€ README*.md
 ```
 
 Detailed review guide: [docs/PROJECT_STRUCTURE.md](./docs/PROJECT_STRUCTURE.md)
