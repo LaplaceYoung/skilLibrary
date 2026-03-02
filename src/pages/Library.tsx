@@ -624,7 +624,7 @@ echo "Installed ${safeSkillFolder} into $TARGET_DIR"
     };
 
     return (
-        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <div className="space-y-8 ui-page-enter">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
                     <h2 className="text-4xl font-extrabold tracking-tight text-text-main mb-2">Skill Library</h2>
@@ -635,7 +635,7 @@ echo "Installed ${safeSkillFolder} into $TARGET_DIR"
                         <button
                             onClick={syncFromLocal}
                             disabled={isSyncing}
-                            className="flex items-center gap-2 bg-black/40 border border-green-500/20 text-green-400 hover:bg-green-500/10 px-4 py-2.5 rounded-[var(--radius-button)] transition-all active:scale-95 disabled:opacity-50"
+                            className="ui-btn-secondary text-green-400 border-green-500/20 hover:bg-green-500/10"
                         >
                             <RefreshCw className={`w-4 h-4 ${isSyncing ? 'animate-spin' : ''}`} />
                             Sync local
@@ -662,10 +662,10 @@ echo "Installed ${safeSkillFolder} into $TARGET_DIR"
                 <div className="flex gap-2">
                     <button
                         onClick={() => setActiveTab('local')}
-                        className={`flex items-center gap-2 px-5 py-2.5 rounded-[var(--radius-button)] font-bold transition-all ${
+                        className={`ui-tab ${
                             activeTab === 'local'
-                                ? 'bg-brand/10 text-brand'
-                                : 'text-text-muted hover:bg-bg-action hover:text-text-main'
+                                ? 'ui-tab-active'
+                                : 'ui-tab-idle'
                         }`}
                     >
                         <HardDrive className="w-4 h-4" />
@@ -673,10 +673,10 @@ echo "Installed ${safeSkillFolder} into $TARGET_DIR"
                     </button>
                     <button
                         onClick={() => setActiveTab('discover')}
-                        className={`flex items-center gap-2 px-5 py-2.5 rounded-[var(--radius-button)] font-bold transition-all ${
+                        className={`ui-tab ${
                             activeTab === 'discover'
-                                ? 'bg-brand/10 text-brand'
-                                : 'text-text-muted hover:bg-bg-action hover:text-text-main'
+                                ? 'ui-tab-active'
+                                : 'ui-tab-idle'
                         }`}
                     >
                         <Compass className="w-4 h-4" />
@@ -704,7 +704,7 @@ echo "Installed ${safeSkillFolder} into $TARGET_DIR"
                     placeholder="Search by name, description, author, or tag..."
                     value={searchTerm}
                     onChange={(event) => setSearchTerm(event.target.value)}
-                    className="w-full themed-input pl-12 pr-4 py-4 focus:ring-4 focus:ring-brand/10 placeholder:text-text-muted"
+                    className="w-full ui-input pl-12 pr-4 py-4 focus:ring-4 focus:ring-brand/10 placeholder:text-text-muted"
                 />
             </div>
 
@@ -733,14 +733,14 @@ echo "Installed ${safeSkillFolder} into $TARGET_DIR"
                         return (
                             <div
                                 key={skill.id}
-                                className="themed-panel p-6 hover:-translate-y-1 hover:shadow-2xl hover:shadow-brand/10 transition-all duration-300 group flex flex-col h-full relative overflow-hidden"
+                                className="themed-panel ui-card-lift p-6 hover:shadow-2xl hover:shadow-brand/10 transition-all duration-300 group flex flex-col h-full relative overflow-hidden"
                             >
                                 <div className="absolute top-0 right-0 w-32 h-32 bg-brand/10 blur-[50px] rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
                                 <div className="flex justify-between items-start mb-4 relative z-10">
                                     <h3 className="text-xl font-bold text-text-main line-clamp-1 flex-1 pr-2">{skill.name}</h3>
                                     {activeTab === 'local' && currentTime - skill.createdAt < 24 * 60 * 60 * 1000 && (
-                                        <span className="bg-brand text-text-main text-xs font-black px-1.5 py-0.5 rounded-full mr-2 animate-pulse uppercase tracking-tighter">
+                                        <span className="ui-pill ui-pill-brand mr-2 animate-pulse">
                                             New
                                         </span>
                                     )}

@@ -12,9 +12,10 @@ export const WorkspacePreview: React.FC<WorkspacePreviewProps> = ({ formData }) 
         <div className="h-full pr-4 overflow-y-auto custom-scrollbar">
             <div className="prose prose-invert prose-brand max-w-none">
                 <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                    {formData.instructions || '*尚未设置指令。*'}
+                    {formData.instructions || '*No instructions yet.*'}
                 </ReactMarkdown>
             </div>
         </div>
     );
 };
+

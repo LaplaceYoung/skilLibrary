@@ -15,7 +15,7 @@ export const WorkspaceInstructions: React.FC<WorkspaceInstructionsProps> = ({ fo
             <textarea
                 value={formData.instructions || ''}
                 onChange={(event) => setFormData((prev) => ({ ...prev, instructions: event.target.value }))}
-                className="flex-1 w-full bg-bg-base border border-border-main rounded-[var(--radius-base)] p-6 font-mono text-sm text-text-main focus:outline-none focus:border-brand/50 focus:ring-1 focus:ring-brand/50 transition-all resize-none custom-scrollbar leading-relaxed"
+                className="flex-1 w-full ui-input p-6 font-mono text-sm resize-none custom-scrollbar leading-relaxed"
                 placeholder={t('workspace.instructions.placeholder')}
                 id="instructions-textarea"
             />

@@ -523,7 +523,7 @@ export const RepoImporterModal: React.FC<RepoImporterModalProps> = ({ onClose })
                 <button
                     onClick={handleModalClose}
                     aria-label="Close import modal"
-                    className="absolute top-4 right-4 text-text-muted hover:text-text-main transition-colors p-2 rounded-full hover:bg-white/5"
+                    className="absolute top-4 right-4 ui-icon-btn text-text-muted hover:text-text-main hover:bg-white/5"
                 >
                     <X className="w-5 h-5" />
                 </button>
@@ -608,7 +608,7 @@ export const RepoImporterModal: React.FC<RepoImporterModalProps> = ({ onClose })
                                     {status !== 'done' && (
                                         <button
                                             onClick={handleCancelImport}
-                                            className="text-xs font-semibold uppercase tracking-wider text-text-muted hover:text-text-main transition-colors"
+                                            className="ui-btn-secondary px-3 py-1.5 text-xs"
                                         >
                                             Cancel
                                         </button>

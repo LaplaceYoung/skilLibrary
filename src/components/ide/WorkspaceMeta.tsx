@@ -21,47 +21,47 @@ export const WorkspaceMeta: React.FC<WorkspaceMetaProps> = ({ formData, setFormD
     return (
         <div className="max-w-3xl space-y-6">
             <div className="space-y-2">
-                <label className="ui-kicker">技能名称 (唯一标识)</label>
+                <label className="ui-field-label">技能名称 (唯一标识)</label>
                 <input
                     type="text"
                     value={formData.name || ''}
                     onChange={e => setFormData(prev => ({ ...prev, name: e.target.value }))}
                     placeholder="例如：前端架构专家"
-                    className="w-full themed-input px-4 py-3 font-mono"
+                    className="w-full ui-input px-4 py-3 font-mono"
                     id="skill-name-input"
                 />
             </div>
 
             <div className="space-y-2">
-                <label className="ui-kicker">简要描述</label>
+                <label className="ui-field-label">简要描述</label>
                 <textarea
                     value={formData.description || ''}
                     onChange={e => setFormData(prev => ({ ...prev, description: e.target.value }))}
                     placeholder="在这里简要描述这项技能的作用..."
-                    className="w-full themed-input px-4 py-3 h-24 resize-none"
+                    className="w-full ui-input px-4 py-3 h-24 resize-none"
                     id="skill-desc-input"
                 />
             </div>
 
             <div className="grid grid-cols-2 gap-6">
                 <div className="space-y-2">
-                    <label className="ui-kicker">作者</label>
+                    <label className="ui-field-label">作者</label>
                     <input
                         type="text"
                         value={formData.author || ''}
                         onChange={e => setFormData(prev => ({ ...prev, author: e.target.value }))}
-                        className="w-full themed-input px-4 py-3"
+                        className="w-full ui-input px-4 py-3"
                         id="skill-author-input"
                     />
                 </div>
                 <div className="space-y-2">
-                    <label className="ui-kicker">标签 (使用逗号分隔)</label>
+                    <label className="ui-field-label">标签 (使用逗号分隔)</label>
                     <input
                         type="text"
                         value={formData.tags?.join(', ') || ''}
                         onChange={handleTagsChange}
                         placeholder="react, tailwind, 设计"
-                        className="w-full themed-input px-4 py-3"
+                        className="w-full ui-input px-4 py-3"
                         id="skill-tags-input"
                     />
                 </div>
@@ -101,13 +101,13 @@ export const WorkspaceMeta: React.FC<WorkspaceMetaProps> = ({ formData, setFormD
             </div>
 
             <div className="space-y-2">
-                <label className="ui-kicker">限制工具访问权限 (Allowed Tools)</label>
+                <label className="ui-field-label">限制工具访问权限 (Allowed Tools)</label>
                 <input
                     type="text"
                     value={formData.allowedTools?.join(', ') || ''}
                     onChange={handleToolsChange}
                     placeholder="例如: Read, Grep, Bash, Glob (留空则允许全部)"
-                    className="w-full themed-input px-4 py-3 font-mono text-sm"
+                    className="w-full ui-input px-4 py-3 font-mono text-sm"
                     id="allowed-tools-input"
                 />
                 <p className="ui-caption">使用逗号分隔指定 Claude 运行此技能时可以使用的沙箱工具。</p>
@@ -115,7 +115,7 @@ export const WorkspaceMeta: React.FC<WorkspaceMetaProps> = ({ formData, setFormD
 
             <div className="grid grid-cols-2 gap-6 pb-8">
                 <div className="space-y-2">
-                    <label className="ui-kicker">执行上下文 (Context)</label>
+                    <label className="ui-field-label">执行上下文 (Context)</label>
                     <Select
                         value={formData.context || 'none'}
                         onChange={value => setFormData(prev => ({ ...prev, context: value as 'fork' | 'none' }))}
@@ -127,14 +127,14 @@ export const WorkspaceMeta: React.FC<WorkspaceMetaProps> = ({ formData, setFormD
                 </div>
 
                 <div className="space-y-2">
-                    <label className="ui-kicker">代理执行器 (Agent)</label>
+                    <label className="ui-field-label">代理执行器 (Agent)</label>
                     <input
                         type="text"
                         value={formData.agent || ''}
                         onChange={e => setFormData(prev => ({ ...prev, agent: e.target.value }))}
                         placeholder="例如: Explore, Plan (选填)"
                         disabled={formData.context !== 'fork'}
-                        className="w-full themed-input px-4 py-3 disabled:opacity-30 font-mono text-sm"
+                        className="w-full ui-input px-4 py-3 disabled:opacity-30 font-mono text-sm"
                         id="agent-input"
                     />
                     <p className="ui-caption">当跨进程隔离执行时，指定由哪个系统代理接管任务。</p>

@@ -63,7 +63,7 @@ export const Simulator: React.FC = () => {
     };
 
     return (
-        <div className="h-[calc(100vh-64px)] flex flex-col animate-in fade-in slide-in-from-bottom-4 duration-500 gap-6">
+        <div className="h-[calc(100vh-64px)] flex flex-col ui-page-enter gap-6">
             <div className="space-y-1">
                 <h2 className="text-3xl font-bold tracking-tight text-text-main">{t('simulator.title')}</h2>
                 <p className="text-text-muted text-sm">{t('simulator.subtitle')}</p>
@@ -131,7 +131,7 @@ export const Simulator: React.FC = () => {
                     <div className="mt-auto p-4 bg-bg-action rounded-[var(--radius-base)] border border-border-main group hover:border-brand/30 transition-colors">
                         <div className="flex items-center gap-2 text-brand mb-2">
                             <Terminal className="w-4 h-4" />
-                            <span className="text-xs font-bold uppercase tracking-wider">{t('simulator.statusLabel')}</span>
+                            <span className="ui-kicker text-brand">{t('simulator.statusLabel')}</span>
                         </div>
                         <p className="text-xs text-text-muted">
                             {messages.length > 0 ? t('simulator.statusActive') : t('simulator.statusWaiting')}

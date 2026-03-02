@@ -193,7 +193,7 @@ export const Select: React.FC<SelectProps> = ({
                 aria-controls={listboxId}
                 disabled={disabled}
                 className={cn(
-                    'flex items-center justify-between w-full themed-input px-4 py-3 cursor-pointer select-none transition-all duration-300 text-left',
+                    'flex items-center justify-between w-full ui-input px-4 py-3 cursor-pointer select-none transition-all duration-300 text-left',
                     menuOpen ? 'border-brand ring-1 ring-brand/50' : '',
                     disabled ? 'opacity-30 cursor-not-allowed' : 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/60'
                 )}

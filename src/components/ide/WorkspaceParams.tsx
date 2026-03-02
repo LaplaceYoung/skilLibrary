@@ -38,10 +38,10 @@ export const WorkspaceParams: React.FC<WorkspaceParamsProps> = ({ formData, setF
                         key={tab.id}
                         id={`tab-${tab.id}`}
                         onClick={() => setActiveTab(tab.id)}
-                        className={`flex items-center gap-2 px-4 py-2 rounded-[var(--radius-button)] font-medium transition-all ${
+                        className={`ui-tab ${
                             activeTab === tab.id
-                                ? 'bg-brand/10 text-brand border border-brand/20 font-bold'
-                                : 'text-text-muted hover:text-text-main hover:bg-bg-action border border-transparent'
+                                ? 'ui-tab-active'
+                                : 'ui-tab-idle'
                         }`}
                     >
                         <tab.icon className="w-4 h-4" />

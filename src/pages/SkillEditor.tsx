@@ -342,7 +342,7 @@ export const SkillEditor: React.FC = () => {
     const isEditingSkillMd = activeFilePath === 'SKILL.md' || activeFilePath?.endsWith('/SKILL.md');
 
     return (
-        <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500 h-[calc(100vh-64px)] flex flex-col">
+        <div className="space-y-4 ui-page-enter h-[calc(100vh-64px)] flex flex-col">
             <div className="flex items-center justify-between shrink-0">
                 <div className="flex items-center gap-4">
                     <button
@@ -357,7 +357,7 @@ export const SkillEditor: React.FC = () => {
                                 {formData.name || (editId ? 'Edit Skill' : 'Create Skill')}
                             </h2>
                             {isV4ModeActive && (
-                                <span className="text-xs bg-brand/20 text-brand px-2 py-1 rounded-[var(--radius-button)] font-bold uppercase tracking-widest border border-brand/20">
+                                <span className="ui-pill ui-pill-brand">
                                     IDE Enabled
                                 </span>
                             )}
@@ -387,14 +387,14 @@ export const SkillEditor: React.FC = () => {
                             <div className="flex gap-1">
                                 <button
                                     onClick={() => openCreateDialog(false)}
-                                    className="p-1 hover:bg-bg-action rounded-[var(--radius-button)] text-text-muted hover:text-text-main transition-colors"
+                                    className="ui-icon-btn text-text-muted hover:text-text-main hover:bg-bg-action"
                                     title="New file"
                                 >
                                     <FilePlus className="w-4 h-4" />
                                 </button>
                                 <button
                                     onClick={() => openCreateDialog(true)}
-                                    className="p-1 hover:bg-bg-action rounded-[var(--radius-button)] text-text-muted hover:text-text-main transition-colors"
+                                    className="ui-icon-btn text-text-muted hover:text-text-main hover:bg-bg-action"
                                     title="New folder"
                                 >
                                     <FolderPlus className="w-4 h-4" />
@@ -410,7 +410,7 @@ export const SkillEditor: React.FC = () => {
                 <div className="flex-1 themed-panel overflow-hidden relative flex flex-col min-w-0">
                     {!dirHandle && (
                         <div className="absolute top-4 right-4 z-50 pointer-events-none opacity-60">
-                            <span className="text-xs bg-amber-500/20 text-amber-500 px-2 py-1 rounded font-bold uppercase tracking-widest border border-amber-500/20">
+                            <span className="ui-pill ui-pill-warning">
                                 Classic mode. Link a folder to enable multi-file IDE.
                             </span>
                         </div>
@@ -461,7 +461,7 @@ export const SkillEditor: React.FC = () => {
                                 value={newEntryName}
                                 onChange={(event) => setNewEntryName(event.target.value)}
                                 placeholder={`e.g. ${createEntryType === 'file' ? 'notes.md' : 'prompts'}`}
-                                className="w-full themed-input px-4 py-3"
+                                className="w-full ui-input px-4 py-3"
                             />
 
                             <div className="flex justify-end gap-2">

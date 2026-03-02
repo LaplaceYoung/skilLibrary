@@ -99,12 +99,27 @@
 
 :root {
   scroll-behavior: smooth;
+  --ui-ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+  --ui-duration-enter: 420ms;
+  --ui-duration-fast: 180ms;
 }
 
 body {
   @apply bg-bg-base text-text-main font-sans selection:bg-brand/30 transition-colors duration-700;
   margin: 0;
   min-height: 100vh;
+}
+
+@keyframes ui-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Consistent keyboard-visible focus ring across interactive controls. */
@@ -150,10 +165,6 @@ body {
   @apply bg-bg-action hover:bg-bg-action-hover border border-transparent hover:border-border-main rounded-[var(--radius-button)] transition-all duration-300;
 }
 
-.themed-input {
-  @apply bg-bg-base border border-border-main rounded-[calc(var(--radius-base))] focus:border-brand/50 focus:ring-1 focus:ring-brand/50 transition-all text-text-main;
-}
-
 /* Reusable UI semantics */
 .ui-kicker {
   @apply text-xs font-bold uppercase tracking-widest text-text-muted;
@@ -161,6 +172,10 @@ body {
 
 .ui-caption {
   @apply text-xs text-text-muted;
+}
+
+.ui-page-enter {
+  animation: ui-fade-up var(--ui-duration-enter) var(--ui-ease-out-quint) both;
 }
 
 .ui-field-label {
@@ -179,8 +194,24 @@ body {
   @apply inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-[var(--radius-button)] bg-bg-action border border-border-main hover:bg-bg-panel text-text-main font-bold transition-all duration-200 active:scale-95 disabled:opacity-50;
 }
 
+.ui-btn-danger {
+  @apply inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-[var(--radius-button)] bg-red-500/10 border border-red-500/30 hover:bg-red-500/20 text-red-400 font-bold transition-all duration-200 active:scale-95 disabled:opacity-50;
+}
+
 .ui-icon-btn {
   @apply inline-flex items-center justify-center p-1.5 rounded-[var(--radius-button)] transition-colors;
+}
+
+.ui-tab {
+  @apply inline-flex items-center gap-2 px-5 py-2.5 rounded-[var(--radius-button)] font-bold border border-transparent transition-all;
+}
+
+.ui-tab-active {
+  @apply bg-brand/10 text-brand border-brand/20;
+}
+
+.ui-tab-idle {
+  @apply text-text-muted hover:bg-bg-action hover:text-text-main;
 }
 
 .ui-badge {
@@ -209,6 +240,26 @@ body {
 
 .ui-badge-brand {
   @apply text-brand bg-brand/10 border-brand/20;
+}
+
+.ui-pill {
+  @apply inline-flex items-center gap-1 px-2 py-1 rounded-[var(--radius-button)] border text-xs font-bold uppercase tracking-widest;
+}
+
+.ui-pill-brand {
+  @apply bg-brand/10 text-brand border-brand/20;
+}
+
+.ui-pill-warning {
+  @apply bg-amber-500/10 text-amber-400 border-amber-500/30;
+}
+
+.ui-card-lift {
+  @apply transition-transform duration-200;
+}
+
+.ui-card-lift:hover {
+  transform: translateY(-4px);
 }
 
 /* Prose Configuration for Markdown (Themed) */
@@ -249,4 +300,27 @@ body {
 
 .prose blockquote {
   @apply border-l-4 border-brand/50 pl-4 py-1 italic text-text-muted bg-brand/5 rounded-r-[var(--radius-base)];
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    scroll-behavior: auto;
+  }
+
+  .ui-page-enter {
+    animation: none;
+  }
+
+  .ui-card-lift,
+  .ui-btn-primary,
+  .ui-btn-secondary,
+  .ui-btn-danger,
+  .ui-icon-btn,
+  .ui-tab {
+    transition-duration: 1ms !important;
+  }
+
+  .ui-card-lift:hover {
+    transform: none;
+  }
 }

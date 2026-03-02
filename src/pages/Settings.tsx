@@ -103,7 +103,7 @@ export const Settings: React.FC = () => {
     };
 
     return (
-        <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-2xl">
+        <div className="space-y-6 ui-page-enter max-w-2xl">
             <div className="space-y-1">
                 <h2 className="text-3xl font-bold tracking-tight text-text-main">System Settings</h2>
                 <p className="text-text-muted text-sm">Manage local sync, appearance, and MCP integration.</p>
@@ -132,14 +132,14 @@ export const Settings: React.FC = () => {
                                         <button
                                             onClick={() => void syncFromLocal()}
                                             disabled={isSyncing}
-                                            className="text-xs bg-green-500/10 text-green-400 px-3 py-1.5 rounded-lg hover:bg-green-500/20 transition-all font-semibold disabled:opacity-50"
+                                            className="ui-btn-secondary px-3 py-1.5 text-sm"
                                         >
                                             {isSyncing ? 'Syncing...' : 'Resync'}
                                         </button>
                                     </div>
                                     <button
                                         onClick={() => void handleDisconnect()}
-                                        className="p-3 bg-red-500/10 text-red-400 rounded-xl hover:bg-red-500/20 transition-all"
+                                        className="ui-btn-danger px-3 py-3"
                                         title="Disconnect"
                                     >
                                         <Unlink className="w-5 h-5" />
@@ -169,10 +169,10 @@ export const Settings: React.FC = () => {
                         </p>
                         <button
                             onClick={() => void handleClearData()}
-                            className={`text-xs px-4 py-2 rounded-lg font-bold transition-all flex items-center gap-2 ${
+                            className={`ui-btn-danger text-sm ${
                                 confirmClear
-                                    ? 'bg-red-500 text-white animate-pulse'
-                                    : 'bg-red-500/10 text-red-500 hover:bg-red-500/20'
+                                    ? 'bg-red-500 text-white border-red-500 animate-pulse'
+                                    : ''
                             }`}
                         >
                             <AlertTriangle className="w-4 h-4" />
@@ -323,13 +323,13 @@ export const Settings: React.FC = () => {
                                             <div className="flex-1 bg-black/40 border border-green-500/20 rounded-xl p-3 flex items-center gap-3">
                                                 <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
                                                 <span className="text-sm font-bold text-green-400">MCP proxy connected</span>
-                                                <span className="text-xs font-mono text-green-500/80 ml-auto">
+                                                <span className="ui-caption font-mono text-green-500/80 ml-auto">
                                                     {tools.length} tools loaded
                                                 </span>
                                             </div>
                                             <button
                                                 onClick={disconnect}
-                                                className="p-3 bg-red-500/10 text-red-400 rounded-xl hover:bg-red-500/20 transition-all font-bold"
+                                                className="ui-btn-danger px-4 py-3"
                                             >
                                                 Disconnect
                                             </button>
