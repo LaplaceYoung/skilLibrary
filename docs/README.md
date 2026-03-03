@@ -11,6 +11,7 @@ This directory contains product, architecture, and delivery materials for Agent 
 - [project-build-resume-interview-guide.zh-CN.md](./project-build-resume-interview-guide.zh-CN.md): Build-to-interview guidance.
 - [plans/](./plans): Design and iteration records.
 - [notes/optimization-log.zh-CN.md](./notes/optimization-log.zh-CN.md): Session-level optimization notes.
+- [notes/2026-03-03-github-benchmark-and-compliance.zh-CN.md](./notes/2026-03-03-github-benchmark-and-compliance.zh-CN.md): GitHub benchmark and compliance integration record.
 
 ## Documentation Rules
 

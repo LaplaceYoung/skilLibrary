@@ -1,4 +1,10 @@
 import type { Skill } from '../store';
+import {
+    evaluateSkillSourceTrust,
+    getSkillSourceMetadata,
+    getSourceLastUpdatedDays,
+    isLicenseMissing
+} from './sourceTrust';
 
 export type ComplianceDecisionType = 'allow' | 'warn' | 'deny';
 
@@ -9,6 +15,10 @@ export type ComplianceReasonCode =
     | 'SKILL_SECURITY_HARD_BLOCK'
     | 'SKILL_TOOL_SCOPE_BROAD'
     | 'SKILL_SOURCE_UNTRUSTED'
+    | 'SKILL_SOURCE_ARCHIVED'
+    | 'SKILL_SOURCE_LICENSE_MISSING'
+    | 'SKILL_SOURCE_STALE'
+    | 'SKILL_SOURCE_LOW_TRUST'
     | 'MCP_COMMAND_NOT_ALLOWED'
     | 'MCP_ARGS_INVALID'
     | 'MCP_ARGS_TOO_MANY'
@@ -35,6 +45,8 @@ const DEFAULT_ALLOWED_MARKET_HOSTS = ['claude-plugins.dev', 'skillsllm.com'];
 const MAX_ALLOWED_TOOLS = 20;
 const MAX_MCP_ARGS = 32;
 const MAX_MCP_ARG_LENGTH = 256;
+const SOURCE_STALE_DAYS_THRESHOLD = 540;
+const LOW_TRUST_SCORE_THRESHOLD = 60;
 
 function allow(message = 'Compliant'): ComplianceDecision {
     return { decision: 'allow', reasonCode: 'COMPLIANT', message };
@@ -77,6 +89,44 @@ export function evaluateSkillCompliance(input: SkillComplianceInput): Compliance
 
     if (input.action !== 'save' && input.skill.source?.kind === 'repo' && !input.skill.source.repo) {
         return warn('SKILL_SOURCE_UNTRUSTED', 'Imported skill source metadata is incomplete.');
+    }
+
+    const sourceMetadata = getSkillSourceMetadata(input.skill);
+    if (input.action !== 'save' && sourceMetadata?.archived) {
+        return deny('SKILL_SOURCE_ARCHIVED', 'Source repository is archived. Installation/import is blocked.', {
+            source: input.skill.source?.repo || input.skill.source?.url
+        });
+    }
+
+    if (input.action !== 'save' && sourceMetadata && isLicenseMissing(sourceMetadata.license)) {
+        return warn(
+            'SKILL_SOURCE_LICENSE_MISSING',
+            'Source repository has missing or unclear license metadata. Review usage rights before installing.',
+            { license: sourceMetadata.license || 'unknown' }
+        );
+    }
+
+    const staleDays = getSourceLastUpdatedDays(sourceMetadata);
+    if (input.action !== 'save' && staleDays !== null && staleDays > SOURCE_STALE_DAYS_THRESHOLD) {
+        return warn(
+            'SKILL_SOURCE_STALE',
+            `Source repository appears stale (${staleDays} days since last update).`,
+            { staleDays, threshold: SOURCE_STALE_DAYS_THRESHOLD }
+        );
+    }
+
+    if (input.action !== 'save' && sourceMetadata) {
+        const sourceTrust = evaluateSkillSourceTrust(input.skill);
+        if (sourceTrust.score < LOW_TRUST_SCORE_THRESHOLD) {
+            return warn(
+                'SKILL_SOURCE_LOW_TRUST',
+                `Source trust score is low (${sourceTrust.score}). Manual review is recommended before install/import.`,
+                {
+                    trustScore: sourceTrust.score,
+                    reasons: sourceTrust.reasons.slice(0, 3)
+                }
+            );
+        }
     }
 
     return allow();

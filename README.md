@@ -47,6 +47,8 @@ It is not just a markdown editor. It provides:
 | Module | What it does | Status |
 | --- | --- | --- |
 | Skill Library | Local/discover tabs, search, import, install, export | Ready |
+| Discover Trust Signals | Source metadata badges (stars/license/activity), trust score, sort by trust/popular/recent | Ready |
+| Favorites | Pin/unpin local skills and prioritize pinned entries | Ready |
 | Skill Editor | Frontmatter + instructions + preview + multi-file IDE mode | Ready |
 | Local Sync | File System Access API directory link and resync | Ready |
 | Security Scan | Risk scoring (`safe/review/warning/blocked`) | Ready |

@@ -7,16 +7,21 @@ import {
     Download,
     Edit,
     FileCode,
+    GitFork,
     FolderDown,
     FolderSymlink,
     Github,
     HardDrive,
     Hash,
+    Pin,
+    PinOff,
     Plus,
     PlusCircle,
     RefreshCw,
+    Scale,
     Search,
     ShieldAlert,
+    Star,
     Terminal,
     Trash2
 } from 'lucide-react';
@@ -28,6 +33,7 @@ import { evaluateSkillCompliance } from '../lib/compliancePolicy';
 import { summarizeValidation, validateSkillDraft } from '../lib/skillValidator';
 import { createTraceId } from '../lib/auditLog';
 import { buildSkillIndex, filterSkillIndexBySource, searchSkillIndex } from '../lib/skillIndex';
+import { evaluateSkillSourceTrust, getSkillSourceMetadata, getSourceLastUpdatedDays } from '../lib/sourceTrust';
 import {
     getInstallDotDirs,
     type SkillInstallTarget,
@@ -112,6 +118,29 @@ function createSafeHeredocDelimiter(content: string): string {
     return delimiter;
 }
 
+type DiscoverSortKey = 'relevance' | 'trust' | 'popular' | 'recent';
+
+const COMPACT_NUMBER_FORMATTER = new Intl.NumberFormat('en-US', {
+    notation: 'compact',
+    maximumFractionDigits: 1
+});
+
+function formatCompactCount(value: number | undefined): string {
+    if (typeof value !== 'number' || !Number.isFinite(value)) return '0';
+    return COMPACT_NUMBER_FORMATTER.format(value);
+}
+
+function getTimestamp(): number {
+    return Date.now();
+}
+
+function getTrustBadgeClass(trust: ReturnType<typeof evaluateSkillSourceTrust>): string {
+    if (trust.flags.archived) return 'ui-badge-danger';
+    if (trust.level === 'high') return 'ui-badge-success';
+    if (trust.level === 'medium') return 'ui-badge-attention';
+    return 'ui-badge-warning';
+}
+
 export const Library: React.FC = () => {
     const {
         skills,
@@ -121,6 +150,7 @@ export const Library: React.FC = () => {
         isFetchingAwesome,
         fetchAwesomeSkills,
         addSkill,
+        updateSkill,
         deleteSkill,
         dirHandle,
         syncFromLocal,
@@ -132,6 +162,7 @@ export const Library: React.FC = () => {
 
     const [searchTerm, setSearchTerm] = useState('');
     const [activeTab, setActiveTab] = useState<'local' | 'discover'>('local');
+    const [discoverSort, setDiscoverSort] = useState<DiscoverSortKey>('trust');
     const [isImporterOpen, setIsImporterOpen] = useState(false);
     const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
     const [currentTime] = useState(() => Date.now());
@@ -174,12 +205,45 @@ export const Library: React.FC = () => {
         });
     }, [skillIndexCache, skills, awesomeSkills, customDiscoverSkills]);
 
-    const filteredSkills = useMemo(() => {
+    const filteredEntries = useMemo(() => {
         const scopedEntries = activeTab === 'local'
             ? filterSkillIndexBySource(indexedSkills, 'local')
             : indexedSkills.filter((entry) => entry.sourceMeta.sourceType !== 'local');
-        return searchSkillIndex(scopedEntries, searchTerm).map((entry) => entry.skill);
-    }, [indexedSkills, activeTab, searchTerm]);
+        const searched = searchSkillIndex(scopedEntries, searchTerm);
+
+        if (activeTab === 'local') {
+            return [...searched].sort((left, right) => {
+                const leftPinned = left.skill.pinnedAt ? 1 : 0;
+                const rightPinned = right.skill.pinnedAt ? 1 : 0;
+                if (leftPinned !== rightPinned) return rightPinned - leftPinned;
+                return right.skill.updatedAt - left.skill.updatedAt;
+            });
+        }
+
+        if (discoverSort === 'relevance') return searched;
+
+        return [...searched].sort((left, right) => {
+            if (discoverSort === 'popular') {
+                const leftStars = getSkillSourceMetadata(left.skill)?.stargazersCount || 0;
+                const rightStars = getSkillSourceMetadata(right.skill)?.stargazersCount || 0;
+                return rightStars - leftStars;
+            }
+
+            if (discoverSort === 'recent') {
+                const leftDays = getSourceLastUpdatedDays(getSkillSourceMetadata(left.skill));
+                const rightDays = getSourceLastUpdatedDays(getSkillSourceMetadata(right.skill));
+                const leftScore = leftDays === null ? Number.POSITIVE_INFINITY : leftDays;
+                const rightScore = rightDays === null ? Number.POSITIVE_INFINITY : rightDays;
+                return leftScore - rightScore;
+            }
+
+            const leftTrust = evaluateSkillSourceTrust(left.skill).score;
+            const rightTrust = evaluateSkillSourceTrust(right.skill).score;
+            return rightTrust - leftTrust;
+        });
+    }, [indexedSkills, activeTab, searchTerm, discoverSort]);
+
+    const filteredSkills = useMemo(() => filteredEntries.map((entry) => entry.skill), [filteredEntries]);
 
     const handleImportLocal = async () => {
         const traceId = createTraceId();
@@ -352,6 +416,9 @@ export const Library: React.FC = () => {
             });
             return;
         }
+        if (compliance.decision === 'warn') {
+            addToast(compliance.message, 'info');
+        }
 
         try {
             const picker = (window as PickerWindow).showDirectoryPicker;
@@ -442,6 +509,9 @@ export const Library: React.FC = () => {
                 message: compliance.message
             });
             return;
+        }
+        if (compliance.decision === 'warn') {
+            addToast(compliance.message, 'info');
         }
 
         if (dirHandle) {
@@ -581,6 +651,9 @@ echo "Installed ${safeSkillFolder} into $TARGET_DIR"
             });
             return;
         }
+        if (compliance.decision === 'warn') {
+            addToast(compliance.message, 'info');
+        }
 
         addSkill({
             name: skill.name,
@@ -621,6 +694,14 @@ echo "Installed ${safeSkillFolder} into $TARGET_DIR"
             target: skill.name,
             message: 'Installed skill from discover feed.'
         });
+    };
+
+    const handleTogglePin = (skill: Skill) => {
+        const willPin = !skill.pinnedAt;
+        updateSkill(skill.id, {
+            pinnedAt: willPin ? getTimestamp() : null
+        });
+        addToast(willPin ? `Pinned "${skill.name}".` : `Unpinned "${skill.name}".`, 'info');
     };
 
     return (
@@ -685,13 +766,27 @@ echo "Installed ${safeSkillFolder} into $TARGET_DIR"
                 </div>
 
                 {activeTab === 'discover' && (
-                    <button
-                        onClick={() => setIsImporterOpen(true)}
-                        className="ui-btn-secondary text-sm py-2"
-                    >
-                        <Github className="w-4 h-4" />
-                        Add GitHub repo
-                    </button>
+                    <div className="flex flex-wrap items-center gap-2">
+                        <label className="text-xs uppercase tracking-wide text-text-muted font-mono">Sort</label>
+                        <select
+                            value={discoverSort}
+                            onChange={(event) => setDiscoverSort(event.target.value as DiscoverSortKey)}
+                            className="ui-input py-2 px-3 text-sm min-w-40"
+                        >
+                            <option value="trust">Trust score</option>
+                            <option value="popular">Most starred</option>
+                            <option value="recent">Recently updated</option>
+                            <option value="relevance">Relevance</option>
+                        </select>
+
+                        <button
+                            onClick={() => setIsImporterOpen(true)}
+                            className="ui-btn-secondary text-sm py-2"
+                        >
+                            <Github className="w-4 h-4" />
+                            Add GitHub repo
+                        </button>
+                    </div>
                 )}
             </div>
 
@@ -728,7 +823,15 @@ echo "Installed ${safeSkillFolder} into $TARGET_DIR"
                     {filteredSkills.map((skill) => {
                         const securityBadge = getSecurityBadge(skill);
                         const isInstalled = skills.some((installedSkill) => installedSkill.name === skill.name);
-                        const isBlocked = Boolean(skill.security?.hardTriggered);
+                        const sourceMetadata = getSkillSourceMetadata(skill);
+                        const sourceTrust = evaluateSkillSourceTrust(skill);
+                        const installCompliance = activeTab === 'discover'
+                            ? evaluateSkillCompliance({ skill, action: 'install' })
+                            : null;
+                        const sourceUpdatedAt = sourceMetadata?.updatedAt || sourceMetadata?.pushedAt;
+                        const hasSourceUpdatedAt = Boolean(sourceUpdatedAt) && Number.isFinite(Date.parse(sourceUpdatedAt || ''));
+                        const isComplianceBlocked = installCompliance?.decision === 'deny';
+                        const isBlocked = Boolean(skill.security?.hardTriggered || isComplianceBlocked);
 
                         return (
                             <div
@@ -739,6 +842,11 @@ echo "Installed ${safeSkillFolder} into $TARGET_DIR"
 
                                 <div className="flex justify-between items-start mb-4 relative z-10">
                                     <h3 className="text-xl font-bold text-text-main line-clamp-1 flex-1 pr-2">{skill.name}</h3>
+                                    {activeTab === 'local' && skill.pinnedAt && (
+                                        <span className="ui-pill ui-pill-warning mr-2">
+                                            Pinned
+                                        </span>
+                                    )}
                                     {activeTab === 'local' && currentTime - skill.createdAt < 24 * 60 * 60 * 1000 && (
                                         <span className="ui-pill ui-pill-brand mr-2 animate-pulse">
                                             New
@@ -796,6 +904,13 @@ echo "Installed ${safeSkillFolder} into $TARGET_DIR"
                                                     )}
                                                 </div>
                                                 <button
+                                                    onClick={() => handleTogglePin(skill)}
+                                                    title={skill.pinnedAt ? 'Unpin' : 'Pin to top'}
+                                                    className="ui-icon-btn text-text-muted hover:text-amber-400 bg-bg-base hover:bg-amber-400/10"
+                                                >
+                                                    {skill.pinnedAt ? <PinOff className="w-4 h-4" /> : <Pin className="w-4 h-4" />}
+                                                </button>
+                                                <button
                                                     onClick={() => handleExportScript(skill)}
                                                     title="Export install script"
                                                     className="ui-icon-btn text-text-muted hover:text-green-400 bg-bg-base hover:bg-green-400/10"
@@ -821,7 +936,17 @@ echo "Installed ${safeSkillFolder} into $TARGET_DIR"
                                             <button
                                                 onClick={() => handleInstallDiscoverSkill(skill)}
                                                 disabled={isInstalled || isBlocked}
-                                                title={isBlocked ? 'Blocked by security policy' : 'Install into local library'}
+                                                title={
+                                                    isInstalled
+                                                        ? 'Already installed in local library'
+                                                        : isComplianceBlocked
+                                                            ? installCompliance?.message || 'Blocked by compliance policy'
+                                                            : skill.security?.hardTriggered
+                                                                ? 'Blocked by security policy'
+                                                                : installCompliance?.decision === 'warn'
+                                                                    ? `${installCompliance.message} (manual review recommended)`
+                                                                    : 'Install into local library'
+                                                }
                                                 className="ui-btn-primary text-bg-base px-3 py-1.5 text-xs"
                                             >
                                                 {isInstalled ? (
@@ -844,8 +969,19 @@ echo "Installed ${safeSkillFolder} into $TARGET_DIR"
                                 </p>
 
                                 <div className="mt-auto space-y-3 relative z-10 border-t border-border-main pt-4">
-                                    {(securityBadge || skill.allowedTools?.length > 0 || skill.context === 'fork') && (
+                                    {(securityBadge || skill.allowedTools?.length > 0 || skill.context === 'fork' || activeTab === 'discover') && (
                                         <div className="flex flex-wrap gap-2">
+                                            {activeTab === 'discover' && (
+                                                <span className={`ui-badge ${getTrustBadgeClass(sourceTrust)}`}>
+                                                    <ShieldAlert className="w-3 h-3" />
+                                                    Trust {sourceTrust.score}
+                                                </span>
+                                            )}
+                                            {activeTab === 'discover' && installCompliance?.decision === 'warn' && (
+                                                <span className="ui-badge ui-badge-attention">
+                                                    Review source
+                                                </span>
+                                            )}
                                             {securityBadge && (
                                                 <span
                                                     className={`ui-badge ${securityBadge.className}`}
@@ -891,6 +1027,35 @@ echo "Installed ${safeSkillFolder} into $TARGET_DIR"
                                             {skill.tags.length > 3 && (
                                                 <span className="ui-badge text-text-muted bg-bg-action border-border-main">
                                                     +{skill.tags.length - 3}
+                                                </span>
+                                            )}
+                                        </div>
+                                    )}
+
+                                    {activeTab === 'discover' && sourceMetadata && (
+                                        <div className="flex flex-wrap gap-2">
+                                            {typeof sourceMetadata.stargazersCount === 'number' && (
+                                                <span className="ui-badge ui-badge-info">
+                                                    <Star className="w-3 h-3" />
+                                                    {formatCompactCount(sourceMetadata.stargazersCount)} stars
+                                                </span>
+                                            )}
+                                            {typeof sourceMetadata.forksCount === 'number' && (
+                                                <span className="ui-badge ui-badge-info">
+                                                    <GitFork className="w-3 h-3" />
+                                                    {formatCompactCount(sourceMetadata.forksCount)} forks
+                                                </span>
+                                            )}
+                                            {sourceMetadata.license && (
+                                                <span className="ui-badge ui-badge-info">
+                                                    <Scale className="w-3 h-3" />
+                                                    {sourceMetadata.license}
+                                                </span>
+                                            )}
+                                            {hasSourceUpdatedAt && (
+                                                <span className="ui-badge ui-badge-info">
+                                                    <Clock className="w-3 h-3" />
+                                                    Updated {formatDistanceToNow(new Date(sourceUpdatedAt || ''), { addSuffix: true })}
                                                 </span>
                                             )}
                                         </div>

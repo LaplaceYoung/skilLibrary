@@ -8,6 +8,18 @@ import { createAuditEvent, type AuditEvent, type AuditEventInput } from '../lib/
 import { buildSkillIndex, type IndexedSkillEntry } from '../lib/skillIndex';
 import type { ValidationSummary } from '../lib/skillValidator';
 
+export interface SkillSourceMetadata {
+    stargazersCount?: number;
+    forksCount?: number;
+    watchersCount?: number;
+    openIssuesCount?: number;
+    archived?: boolean;
+    updatedAt?: string;
+    pushedAt?: string;
+    license?: string;
+    defaultBranch?: string;
+}
+
 export interface Skill {
     id: string;
     // Basic Metadata
@@ -34,7 +46,10 @@ export interface Skill {
         repo?: string;
         path?: string;
         url?: string;
+        metadata?: SkillSourceMetadata;
     };
+
+    pinnedAt?: number | null;
 
     // Internal metadata
     createdAt: number;
@@ -125,6 +140,44 @@ function toStringList(input: unknown): string[] {
     return Array.isArray(input) ? input.filter((entry): entry is string => typeof entry === 'string') : [];
 }
 
+function toNumberValue(input: unknown): number | undefined {
+    return typeof input === 'number' && Number.isFinite(input) ? input : undefined;
+}
+
+function toSourceMetadata(raw: Record<string, unknown>): SkillSourceMetadata | undefined {
+    const rawMetadata = (raw.sourceMetadata && typeof raw.sourceMetadata === 'object')
+        ? raw.sourceMetadata as Record<string, unknown>
+        : raw;
+
+    const metadata: SkillSourceMetadata = {
+        stargazersCount: toNumberValue(rawMetadata.stargazersCount ?? rawMetadata.stars),
+        forksCount: toNumberValue(rawMetadata.forksCount ?? rawMetadata.forks),
+        watchersCount: toNumberValue(rawMetadata.watchersCount ?? rawMetadata.watchers),
+        openIssuesCount: toNumberValue(rawMetadata.openIssuesCount ?? rawMetadata.openIssues),
+        archived: typeof rawMetadata.archived === 'boolean' ? rawMetadata.archived : undefined,
+        updatedAt: toStringValue(rawMetadata.updatedAt, ''),
+        pushedAt: toStringValue(rawMetadata.pushedAt, ''),
+        license: toStringValue(rawMetadata.license, ''),
+        defaultBranch: toStringValue(rawMetadata.defaultBranch, '')
+    };
+
+    const hasValue = Object.values(metadata).some((value) => {
+        if (typeof value === 'number') return Number.isFinite(value);
+        if (typeof value === 'boolean') return true;
+        return Boolean(value);
+    });
+
+    if (!hasValue) return undefined;
+
+    return {
+        ...metadata,
+        updatedAt: metadata.updatedAt || undefined,
+        pushedAt: metadata.pushedAt || undefined,
+        license: metadata.license || undefined,
+        defaultBranch: metadata.defaultBranch || undefined
+    };
+}
+
 function buildIndexFromStateSlice(input: {
     skills: Skill[];
     awesomeSkills: Skill[];
@@ -148,8 +201,9 @@ function getPersistedMcpAuthToken(): string {
     }
 }
 
-function toSkill(raw: Record<string, unknown>, source: Skill['source']): Skill {
+function toSkill(raw: Record<string, unknown>, source: NonNullable<Skill['source']>): Skill {
     const now = Date.now();
+    const sourceMetadata = toSourceMetadata(raw);
     return withComputedSignals({
         id: toStringValue(raw.id, uuidv4()),
         name: toStringValue(raw.name) || toStringValue(raw.title) || `skill-${uuidv4().slice(0, 8)}`,
@@ -171,7 +225,9 @@ function toSkill(raw: Record<string, unknown>, source: Skill['source']): Skill {
                     typeof (attachment as { content?: unknown }).content === 'string'
             )
             : undefined,
-        source,
+        source: sourceMetadata
+            ? { ...source, metadata: sourceMetadata }
+            : source,
         createdAt: now,
         updatedAt: now
     });

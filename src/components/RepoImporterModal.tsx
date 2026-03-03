@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 import { CheckCircle, Download, Github, Loader2, X } from 'lucide-react';
-import { useSkillStore, type Skill } from '../store';
+import { useSkillStore, type Skill, type SkillSourceMetadata } from '../store';
 import { parseSkillContent } from '../lib/fsCore';
 import { cn } from '../lib/utils';
 import { evaluateSkillCompliance } from '../lib/compliancePolicy';
@@ -172,6 +172,37 @@ function pickCandidateFiles(treeNodes: GitTreeNode[]): GitTreeNode[] {
         .slice(0, 80);
 }
 
+function toOptionalNumber(value: unknown): number | undefined {
+    return typeof value === 'number' && Number.isFinite(value) ? value : undefined;
+}
+
+function buildRepoSourceMetadata(repoData: {
+    stargazers_count?: unknown;
+    forks_count?: unknown;
+    watchers_count?: unknown;
+    open_issues_count?: unknown;
+    archived?: unknown;
+    updated_at?: unknown;
+    pushed_at?: unknown;
+    license?: { spdx_id?: unknown; name?: unknown } | null;
+    default_branch?: unknown;
+}): SkillSourceMetadata {
+    const spdx = typeof repoData.license?.spdx_id === 'string' ? repoData.license.spdx_id : '';
+    const licenseName = typeof repoData.license?.name === 'string' ? repoData.license.name : '';
+
+    return {
+        stargazersCount: toOptionalNumber(repoData.stargazers_count),
+        forksCount: toOptionalNumber(repoData.forks_count),
+        watchersCount: toOptionalNumber(repoData.watchers_count),
+        openIssuesCount: toOptionalNumber(repoData.open_issues_count),
+        archived: typeof repoData.archived === 'boolean' ? repoData.archived : false,
+        updatedAt: typeof repoData.updated_at === 'string' ? repoData.updated_at : undefined,
+        pushedAt: typeof repoData.pushed_at === 'string' ? repoData.pushed_at : undefined,
+        license: spdx || licenseName || undefined,
+        defaultBranch: typeof repoData.default_branch === 'string' ? repoData.default_branch : undefined
+    };
+}
+
 export const RepoImporterModal: React.FC<RepoImporterModalProps> = ({ onClose }) => {
     const { addCustomDiscoverSkills, addToast, addAuditEvent, setValidationSummary } = useSkillStore();
     const [repoInput, setRepoInput] = useState('');
@@ -286,8 +317,19 @@ export const RepoImporterModal: React.FC<RepoImporterModalProps> = ({ onClose })
             if (!repoResponse.ok) {
                 throw new Error(`Repository not found or API rate limited (HTTP ${repoResponse.status}).`);
             }
-            const repoData = await repoResponse.json() as { default_branch?: string };
+            const repoData = await repoResponse.json() as {
+                default_branch?: string;
+                stargazers_count?: number;
+                forks_count?: number;
+                watchers_count?: number;
+                open_issues_count?: number;
+                archived?: boolean;
+                updated_at?: string;
+                pushed_at?: string;
+                license?: { spdx_id?: string; name?: string } | null;
+            };
             const defaultBranch = repoData.default_branch || 'main';
+            const sourceMetadata = buildRepoSourceMetadata(repoData);
 
             const treeResponse = await fetchWithRetry(
                 `https://api.github.com/repos/${parsedRepo.owner}/${parsedRepo.repo}/git/trees/${defaultBranch}?recursive=1`,
@@ -404,7 +446,8 @@ export const RepoImporterModal: React.FC<RepoImporterModalProps> = ({ onClose })
                         kind: 'repo',
                         repo: `${parsedRepo.owner}/${parsedRepo.repo}`,
                         path: result.filePath,
-                        url: result.rawUrl
+                        url: result.rawUrl,
+                        metadata: sourceMetadata
                     },
                     createdAt: Date.now(),
                     updatedAt: Date.now()
