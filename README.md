@@ -55,7 +55,11 @@ It is not just a markdown editor. It provides:
 | Compliance Policy | Action-level guardrails for save/import/install/export | Ready |
 | MCP Integration | Connect to local MCP proxy and inspect tool list | Ready |
 | Skill Simulator | Mock chat simulation with skill instructions | Ready |
+| Command Palette | `Ctrl/Cmd + K` quick actions for navigation, theme, sync, and motion controls | Ready |
+| Global Shortcuts | `G H / G E / G S / G ,` route chords with input-focus conflict protection | Ready |
 | i18n + Themes | `zh-CN/en-US` + dynamic p5 theme backgrounds | Ready |
+| Performance Controls | Background motion mode (`auto/on/off`) with reduced-motion and data-saver awareness | Ready |
+| Launch Pages | Multi-page promo site (`/promo`) for positioning, growth loops, and benchmark narrative | Ready |
 
 ## Architecture
 
@@ -98,6 +102,8 @@ npm run dev
 
 Open `http://localhost:5173`.
 
+Promo pages: `http://localhost:5173/promo`.
+
 ### 3) Optional: run MCP proxy
 
 ```bash
@@ -109,6 +115,17 @@ npm run mcp
 ```bash
 npm run sync:awesome
 ```
+
+### Compatibility Matrix (Install Targets)
+
+| Target Ecosystem | Status |
+| --- | --- |
+| Claude Code (`.claude`) | Supported |
+| OpenAI Codex (`.codex`) | Supported |
+| Cursor (`.cursor`) | Supported |
+| Windsurf (`.windsurf`) | Supported |
+| GitHub Copilot-style workspace (`.github`) | Supported |
+| Gemini (`.gemini`) | Supported |
 
 ## MCP Proxy Setup
 
@@ -140,20 +157,20 @@ Then configure in app settings:
 
 ```text
 .
-├─ docs/                 # docs index, plans, notes, repository checklist
-├─ mcp-proxy/            # local MCP bridge service
-├─ public/               # static assets and skill catalog
-├─ scripts/              # maintenance scripts
-├─ src/
-│  ├─ components/        # shared UI and IDE components
-│  │  └─ ide/            # file explorer and code pane
-│  ├─ pages/             # Library / SkillEditor / Simulator / Settings
-│  ├─ lib/               # fs, validation, compliance, security, indexing
-│  ├─ store/             # app and MCP state stores
-│  └─ i18n/              # locale messages
-├─ CONTRIBUTING.md
-├─ LICENSE
-└─ README*.md
+|-- docs/                  # docs index, structure, and engineering standards
+|-- mcp-proxy/             # local MCP bridge service
+|-- public/                # static assets and skill catalog
+|-- scripts/               # maintenance scripts
+|-- src/
+|   |-- components/        # shared UI and IDE components
+|   |   `-- ide/           # file explorer and code pane
+|   |-- pages/             # Library / SkillEditor / Simulator / Settings
+|   |-- lib/               # fs, validation, compliance, security, indexing
+|   |-- store/             # app and MCP state stores
+|   `-- i18n/              # locale messages
+|-- CONTRIBUTING.md
+|-- LICENSE
+`-- README*.md
 ```
 
 Detailed review guide: [docs/PROJECT_STRUCTURE.md](./docs/PROJECT_STRUCTURE.md)
@@ -161,8 +178,18 @@ Detailed review guide: [docs/PROJECT_STRUCTURE.md](./docs/PROJECT_STRUCTURE.md)
 ## Quality Gates
 
 ```bash
+npm run check:repo
 npm run lint
 npm run build
+npm run analyze:bundle
+```
+
+E2E smoke tests:
+
+```bash
+npx playwright install chromium
+npm run test:e2e:smoke
+npm run test:e2e:a11y
 ```
 
 Or run both:
@@ -171,11 +198,25 @@ Or run both:
 npm run check
 ```
 
+Or run full local gate (repo hygiene + lint + build + bundle analysis):
+
+```bash
+npm run check:full
+```
+
 ## Documentation
 
 - Docs index: [docs/README.md](./docs/README.md)
 - Review structure: [docs/PROJECT_STRUCTURE.md](./docs/PROJECT_STRUCTURE.md)
-- Remote repository cleanup guide: [docs/repository/REMOTE_REPO_CLEANUP.md](./docs/repository/REMOTE_REPO_CLEANUP.md)
+- UI/UX compliance baseline: [docs/standards/UI_UX_COMPLIANCE.md](./docs/standards/UI_UX_COMPLIANCE.md)
+
+## GitHub Pages Deployment
+
+- Workflow: [`.github/workflows/deploy-pages.yml`](./.github/workflows/deploy-pages.yml)
+- Trigger: push to `main` or manual `workflow_dispatch`
+- Default URL pattern: `https://<username>.github.io/<repo>/`
+- Current repo target: `https://laplaceyoung.github.io/skilLibrary/`
+- Promo routes: `/promo`, `/promo/growth`, `/promo/benchmarks`
 
 ## Roadmap
 

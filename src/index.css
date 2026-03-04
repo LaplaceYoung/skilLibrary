@@ -2,6 +2,7 @@
 
 @theme {
   --color-brand: var(--brand-color);
+  --color-text-on-brand: var(--text-on-brand);
 
   --color-bg-base: var(--bg-base);
   --color-bg-panel: var(--bg-panel);
@@ -26,6 +27,7 @@
 [data-theme="geometric"] {
   --brand-color: #a5f3fc;
   /* Cyan-ish white */
+  --text-on-brand: #062226;
 
   --bg-base: #000000;
   --bg-panel: #050505;
@@ -35,7 +37,7 @@
   --border-main: #333333;
 
   --text-main: #ffffff;
-  --text-muted: #888888;
+  --text-muted: #a0a0a0;
 
   --font-base: "IBM Plex Sans", "Inter", "Segoe UI", "PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif;
   --font-mono: "JetBrains Mono", "Fira Code", "Cascadia Mono", "SFMono-Regular", "Consolas", "Sarasa Mono SC", monospace;
@@ -51,6 +53,7 @@
 [data-theme="chromatic"] {
   --brand-color: #E2A746;
   /* Amber */
+  --text-on-brand: #1f1504;
 
   --bg-base: #1C2329;
   /* Navy Gray */
@@ -76,6 +79,7 @@
 [data-theme="organic"] {
   --brand-color: #8C9982;
   /* Sage Green */
+  --text-on-brand: #111712;
 
   --bg-base: #EFECE6;
   /* Sand */
@@ -170,6 +174,18 @@ body {
   @apply bg-bg-panel border border-border-main rounded-[calc(var(--radius-base))] transition-all duration-700;
 }
 
+.promo-panel {
+  @apply rounded-[calc(var(--radius-base))] border border-border-main bg-bg-panel/75 backdrop-blur-sm;
+}
+
+.promo-grid-bg {
+  background-image:
+    linear-gradient(to right, color-mix(in oklab, var(--brand-color) 10%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in oklab, var(--brand-color) 10%, transparent) 1px, transparent 1px);
+  background-size: 44px 44px;
+  opacity: 0.55;
+}
+
 .themed-action {
   @apply bg-bg-action hover:bg-bg-action-hover border border-transparent hover:border-border-main rounded-[var(--radius-button)] transition-all duration-300;
 }
@@ -217,7 +233,7 @@ body {
 }
 
 .ui-btn-primary {
-  @apply inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-[var(--radius-button)] bg-brand hover:bg-brand/90 text-text-main font-bold shadow-lg shadow-brand/20 transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:hover:bg-brand;
+  @apply inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-[var(--radius-button)] bg-brand hover:bg-brand/90 text-text-on-brand font-bold shadow-lg shadow-brand/20 transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:hover:bg-brand;
 }
 
 .ui-btn-secondary {

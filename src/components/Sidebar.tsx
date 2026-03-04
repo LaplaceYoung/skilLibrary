@@ -1,6 +1,6 @@
-﻿import React, { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { Library, PenTool, PlayCircle, Settings, Unlink } from 'lucide-react';
+import { Library, PenTool, PlayCircle, Rocket, Settings, Unlink } from 'lucide-react';
 import { Logo } from './Logo';
 import { cn } from '../lib/utils';
 import { useSkillStore } from '../store';
@@ -10,9 +10,15 @@ const navItems = [
     { icon: PenTool, label: 'Forge Editor', path: '/editor' },
     { icon: PlayCircle, label: 'Simulator', path: '/simulator' },
     { icon: Settings, label: 'Settings', path: '/settings' },
+    { icon: Rocket, label: 'Launch Pages', path: '/promo' },
 ];
 
-export const Sidebar: React.FC = () => {
+type SidebarProps = {
+    className?: string;
+    onNavigate?: () => void;
+};
+
+export const Sidebar: React.FC<SidebarProps> = ({ className, onNavigate }) => {
     const { dirHandle, initLocalConnection } = useSkillStore();
     const navigate = useNavigate();
 
@@ -21,7 +27,12 @@ export const Sidebar: React.FC = () => {
     }, [initLocalConnection]);
 
     return (
-        <aside className="w-64 h-screen bg-bg-panel border-r border-border-main flex flex-col z-10 sticky top-0 shrink-0 transition-colors duration-700">
+        <aside
+            className={cn(
+                'w-64 h-full bg-bg-panel border-r border-border-main flex flex-col transition-colors duration-700',
+                className,
+            )}
+        >
             <div className="p-6 flex items-center gap-3">
                 <div className="p-2 bg-brand/20 rounded-xl">
                     <Logo className="w-6 h-6 text-brand" />
@@ -34,24 +45,29 @@ export const Sidebar: React.FC = () => {
                 </div>
             </div>
 
-            <nav className="flex-1 px-4 py-4 space-y-2 overflow-y-auto">
+            <nav className="flex-1 px-4 py-4 space-y-2 overflow-y-auto" aria-label="Primary navigation">
                 {navItems.map((item) => (
                     <NavLink
                         key={item.path}
                         to={item.path}
-                        className={({ isActive }) => cn(
-                            "flex items-center gap-3 px-4 py-3 rounded-[var(--radius-button)] transition-all duration-300 group relative overflow-hidden",
-                            isActive
-                                ? "bg-brand/10 text-brand font-bold shadow-inner"
-                                : "text-text-muted hover:text-text-main hover:bg-bg-action font-medium hover:pl-5"
-                        )}
+                        onClick={onNavigate}
+                        className={({ isActive }) =>
+                            cn(
+                                'flex items-center gap-3 px-4 py-3 rounded-[var(--radius-button)] transition-all duration-300 group relative overflow-hidden',
+                                isActive
+                                    ? 'bg-brand/10 text-brand font-bold shadow-inner'
+                                    : 'text-text-muted hover:text-text-main hover:bg-bg-action font-medium hover:pl-5',
+                            )
+                        }
                     >
                         {({ isActive }) => (
                             <>
-                                <item.icon className={cn(
-                                    "w-5 h-5 transition-transform duration-300 group-hover:scale-110",
-                                    isActive ? 'text-brand' : 'group-hover:text-text-main'
-                                )} />
+                                <item.icon
+                                    className={cn(
+                                        'w-5 h-5 transition-transform duration-300 group-hover:scale-110',
+                                        isActive ? 'text-brand' : 'group-hover:text-text-main',
+                                    )}
+                                />
                                 <span className="text-sm leading-6">{item.label}</span>
                             </>
                         )}
@@ -71,7 +87,10 @@ export const Sidebar: React.FC = () => {
                 ) : (
                     <button
                         type="button"
-                        onClick={() => navigate('/settings')}
+                        onClick={() => {
+                            onNavigate?.();
+                            navigate('/settings');
+                        }}
                         className="themed-panel p-4 border-brand/20 bg-brand/5 text-center group cursor-pointer hover:bg-brand/10 transition-colors w-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/60 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-panel"
                     >
                         <div className="flex items-center justify-center gap-1 mb-1">
@@ -85,4 +104,3 @@ export const Sidebar: React.FC = () => {
         </aside>
     );
 };
-
