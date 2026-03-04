@@ -27,6 +27,7 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
+import { zhCN } from 'date-fns/locale';
 import { useSkillStore, type Skill } from '../store';
 import { findAndImportSkills, installSkillToProject, writeSkillToDisk } from '../lib/fsCore';
 import { evaluateSkillCompliance } from '../lib/compliancePolicy';
@@ -49,27 +50,27 @@ function getSecurityBadge(skill: Skill): {
 
     if (skill.security.hardTriggered) {
         return {
-            text: `Blocked (${skill.security.score})`,
+            text: `已拦截 (${skill.security.score})`,
             className: 'ui-badge-danger'
         };
     }
 
     if (skill.security.score < 70) {
         return {
-            text: `Warning (${skill.security.score})`,
+            text: `警告 (${skill.security.score})`,
             className: 'ui-badge-warning'
         };
     }
 
     if (skill.security.score < 90) {
         return {
-            text: `Review (${skill.security.score})`,
+            text: `复核 (${skill.security.score})`,
             className: 'ui-badge-attention'
         };
     }
 
     return {
-        text: `Safe (${skill.security.score})`,
+        text: `安全 (${skill.security.score})`,
         className: 'ui-badge-success'
     };
 }
@@ -120,14 +121,38 @@ function createSafeHeredocDelimiter(content: string): string {
 
 type DiscoverSortKey = 'relevance' | 'trust' | 'popular' | 'recent';
 
-const COMPACT_NUMBER_FORMATTER = new Intl.NumberFormat('en-US', {
+const TOOL_LABELS: Record<string, string> = {
+    Bash: '命令行',
+    Read: '读取',
+    Grep: '检索',
+    Glob: '全局匹配',
+    Edit: '编辑',
+    Write: '写入'
+};
+
+const DISCOVER_SORT_LABELS: Record<DiscoverSortKey, string> = {
+    trust: '信任分数',
+    popular: '最多星标',
+    recent: '最近更新',
+    relevance: '相关性'
+};
+
+const COMPACT_ZH_NUMBER_FORMATTER = new Intl.NumberFormat('zh-CN', {
     notation: 'compact',
     maximumFractionDigits: 1
 });
 
 function formatCompactCount(value: number | undefined): string {
     if (typeof value !== 'number' || !Number.isFinite(value)) return '0';
-    return COMPACT_NUMBER_FORMATTER.format(value);
+    return COMPACT_ZH_NUMBER_FORMATTER.format(value);
+}
+
+function formatRelativeTime(date: Date | number | string): string {
+    return formatDistanceToNow(new Date(date), { addSuffix: true, locale: zhCN });
+}
+
+function getToolDisplayLabel(tool: string): string {
+    return TOOL_LABELS[tool] || tool;
 }
 
 function getTimestamp(): number {
@@ -257,7 +282,7 @@ export const Library: React.FC = () => {
         try {
             const picker = (window as PickerWindow).showDirectoryPicker;
             if (!picker) {
-                addToast('Directory picker is not supported in this browser.', 'error');
+                addToast('当前浏览器不支持目录选择器。', 'error');
                 addAuditEvent({
                     traceId,
                     eventType: 'import-local',
@@ -273,7 +298,7 @@ export const Library: React.FC = () => {
             const importedSkills = await findAndImportSkills(handle);
 
             if (importedSkills.length === 0) {
-                addToast('No SKILL.md files found in that directory.', 'info');
+                addToast('该目录中未发现 SKILL.md 文件。', 'info');
                 addAuditEvent({
                     traceId,
                     eventType: 'import-local',
@@ -332,13 +357,13 @@ export const Library: React.FC = () => {
             });
 
             if (addedCount > 0) {
-                addToast(`Imported ${addedCount} new skills.`, 'success');
+                addToast(`已导入 ${addedCount} 个新技能。`, 'success');
             } else {
-                addToast('All detected skills are already in your library.', 'info');
+                addToast('检测到的技能已全部存在于技能库中。', 'info');
             }
 
             if (invalidCount > 0 || blockedCount > 0) {
-                addToast(`Skipped ${invalidCount} invalid and ${blockedCount} blocked skill(s).`, 'info');
+                addToast(`已跳过 ${invalidCount} 个无效技能和 ${blockedCount} 个被拦截技能。`, 'info');
             }
 
             addAuditEvent({
@@ -357,7 +382,7 @@ export const Library: React.FC = () => {
         } catch (error: unknown) {
             if (!isAbortError(error)) {
                 console.error(error);
-                addToast('Failed to import local skills.', 'error');
+                addToast('本地技能导入失败。', 'error');
                 addAuditEvent({
                     traceId,
                     eventType: 'import-local',
@@ -391,7 +416,7 @@ export const Library: React.FC = () => {
         const validation = validateSkillDraft(skill);
         if (!validation.isValid) {
             setValidationSummary(summarizeValidation(validation));
-            addToast(`"${skill.name}" failed validation and cannot be installed.`, 'error');
+            addToast(`"${skill.name}" 校验未通过，无法安装。`, 'error');
             addAuditEvent({
                 traceId,
                 eventType: 'install-project',
@@ -423,7 +448,7 @@ export const Library: React.FC = () => {
         try {
             const picker = (window as PickerWindow).showDirectoryPicker;
             if (!picker) {
-                addToast('Directory picker is not supported in this browser.', 'error');
+                addToast('当前浏览器不支持目录选择器。', 'error');
                 addAuditEvent({
                     traceId,
                     eventType: 'install-project',
@@ -438,7 +463,7 @@ export const Library: React.FC = () => {
             const handle = await picker({ mode: 'readwrite' });
             await installSkillToProject(handle, skill, ideTarget);
             const targetDirs = getInstallDotDirs(ideTarget).map((dir) => `${dir}/skills`).join(', ');
-            addToast(`Installed "${skill.name}" to ${targetDirs}.`, 'success');
+            addToast(`已将 "${skill.name}" 安装到 ${targetDirs}。`, 'success');
             addAuditEvent({
                 traceId,
                 eventType: 'install-project',
@@ -451,7 +476,7 @@ export const Library: React.FC = () => {
         } catch (error: unknown) {
             if (!isAbortError(error)) {
                 console.error(error);
-                addToast('Installation failed. Check directory permission and try again.', 'error');
+                addToast('安装失败，请检查目录权限后重试。', 'error');
                 addAuditEvent({
                     traceId,
                     eventType: 'install-project',
@@ -485,7 +510,7 @@ export const Library: React.FC = () => {
         const validation = validateSkillDraft(skill);
         setValidationSummary(summarizeValidation(validation));
         if (!validation.isValid) {
-            addToast(`"${skill.name}" failed validation and cannot be exported.`, 'error');
+            addToast(`"${skill.name}" 校验未通过，无法导出。`, 'error');
             addAuditEvent({
                 traceId,
                 eventType: 'export-script',
@@ -517,7 +542,7 @@ export const Library: React.FC = () => {
         if (dirHandle) {
             try {
                 await writeSkillToDisk(dirHandle, skill);
-                addToast(`Saved "${skill.name}" to linked local directory.`, 'success');
+                addToast(`已将 "${skill.name}" 保存到已连接目录。`, 'success');
                 addAuditEvent({
                     traceId,
                     eventType: 'export-script',
@@ -528,7 +553,7 @@ export const Library: React.FC = () => {
                 return;
             } catch (error) {
                 console.error(error);
-                addToast('Direct write failed, fallback script downloaded.', 'error');
+                addToast('直写失败，已下载回退安装脚本。', 'error');
                 addAuditEvent({
                     traceId,
                     eventType: 'export-script',
@@ -598,7 +623,7 @@ echo "Installed ${safeSkillFolder} into $TARGET_DIR"
         });
 
         if (skills.some((existingSkill) => existingSkill.name === skill.name)) {
-            addToast(`${skill.name} is already installed.`, 'info');
+            addToast(`${skill.name} 已安装。`, 'info');
             addAuditEvent({
                 traceId,
                 eventType: 'install-library',
@@ -611,7 +636,7 @@ echo "Installed ${safeSkillFolder} into $TARGET_DIR"
         }
 
         if (skill.security?.hardTriggered) {
-            addToast(`"${skill.name}" is blocked by security scan.`, 'error');
+            addToast(`"${skill.name}" 被安全扫描拦截。`, 'error');
             addAuditEvent({
                 traceId,
                 eventType: 'install-library',
@@ -626,7 +651,7 @@ echo "Installed ${safeSkillFolder} into $TARGET_DIR"
         const validation = validateSkillDraft(skill);
         setValidationSummary(summarizeValidation(validation));
         if (!validation.isValid) {
-            addToast(`"${skill.name}" failed validation and cannot be installed.`, 'error');
+            addToast(`"${skill.name}" 校验未通过，无法安装。`, 'error');
             addAuditEvent({
                 traceId,
                 eventType: 'install-library',
@@ -686,7 +711,7 @@ echo "Installed ${safeSkillFolder} into $TARGET_DIR"
             }
         }
 
-        addToast(`Installed ${skill.name}.`, 'success');
+        addToast(`已安装 ${skill.name}。`, 'success');
         addAuditEvent({
             traceId,
             eventType: 'install-library',
@@ -701,15 +726,15 @@ echo "Installed ${safeSkillFolder} into $TARGET_DIR"
         updateSkill(skill.id, {
             pinnedAt: willPin ? getTimestamp() : null
         });
-        addToast(willPin ? `Pinned "${skill.name}".` : `Unpinned "${skill.name}".`, 'info');
+        addToast(willPin ? `已置顶 "${skill.name}"。` : `已取消置顶 "${skill.name}"。`, 'info');
     };
 
     return (
         <div className="space-y-8 ui-page-enter">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h2 className="ui-page-title mb-2">Skill Library</h2>
-                    <p className="ui-page-subtitle">Discover, review, and deploy skills with security visibility.</p>
+                    <h2 className="ui-page-title mb-2">技能库</h2>
+                    <p className="ui-page-subtitle">在统一工作区中发现、评审并部署技能资产。</p>
                 </div>
                 <div className="flex items-center gap-3">
                     {dirHandle && (
@@ -719,7 +744,7 @@ echo "Installed ${safeSkillFolder} into $TARGET_DIR"
                             className="ui-btn-secondary text-green-400 border-green-500/20 hover:bg-green-500/10"
                         >
                             <RefreshCw className={`w-4 h-4 ${isSyncing ? 'animate-spin' : ''}`} />
-                            Sync local
+                            同步本地
                         </button>
                     )}
                     <button
@@ -727,14 +752,14 @@ echo "Installed ${safeSkillFolder} into $TARGET_DIR"
                         className="hidden md:inline-flex ui-btn-secondary whitespace-nowrap"
                     >
                         <FolderDown className="w-4 h-4" />
-                        Import local
+                        导入本地
                     </button>
                     <button
                         onClick={() => navigate('/editor')}
-                        className="ui-btn-primary text-white whitespace-nowrap px-5"
+                        className="ui-btn-primary whitespace-nowrap px-5"
                     >
                         <Plus className="w-5 h-5" />
-                        New skill
+                        新建技能
                     </button>
                 </div>
             </div>
@@ -750,7 +775,7 @@ echo "Installed ${safeSkillFolder} into $TARGET_DIR"
                         }`}
                     >
                         <HardDrive className="w-4 h-4" />
-                        Local ({activeTab === 'local' ? filteredSkills.length : skills.length})
+                        本地 ({activeTab === 'local' ? filteredSkills.length : skills.length})
                     </button>
                     <button
                         onClick={() => setActiveTab('discover')}
@@ -761,22 +786,23 @@ echo "Installed ${safeSkillFolder} into $TARGET_DIR"
                         }`}
                     >
                         <Compass className="w-4 h-4" />
-                        Discover ({activeTab === 'discover' ? filteredSkills.length : awesomeSkills.length + customDiscoverSkills.length})
+                        发现 ({activeTab === 'discover' ? filteredSkills.length : awesomeSkills.length + customDiscoverSkills.length})
                     </button>
                 </div>
 
                 {activeTab === 'discover' && (
                     <div className="flex flex-wrap items-center gap-2">
-                        <label className="text-xs uppercase tracking-wide text-text-muted font-mono">Sort</label>
+                        <label htmlFor="discover-sort-select" className="text-xs uppercase tracking-wide text-text-muted font-mono">排序</label>
                         <select
+                            id="discover-sort-select"
                             value={discoverSort}
                             onChange={(event) => setDiscoverSort(event.target.value as DiscoverSortKey)}
                             className="ui-input py-2 px-3 text-sm min-w-40"
                         >
-                            <option value="trust">Trust score</option>
-                            <option value="popular">Most starred</option>
-                            <option value="recent">Recently updated</option>
-                            <option value="relevance">Relevance</option>
+                            <option value="trust">{DISCOVER_SORT_LABELS.trust}</option>
+                            <option value="popular">{DISCOVER_SORT_LABELS.popular}</option>
+                            <option value="recent">{DISCOVER_SORT_LABELS.recent}</option>
+                            <option value="relevance">{DISCOVER_SORT_LABELS.relevance}</option>
                         </select>
 
                         <button
@@ -784,38 +810,38 @@ echo "Installed ${safeSkillFolder} into $TARGET_DIR"
                             className="ui-btn-secondary text-sm py-2"
                         >
                             <Github className="w-4 h-4" />
-                            Add GitHub repo
+                            添加 GitHub 仓库
                         </button>
                     </div>
                 )}
             </div>
 
-            <div className="relative group">
-                <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
-                    <Search className="w-5 h-5 text-slate-500 group-focus-within:text-brand transition-colors" />
-                </div>
+            <div className="relative">
+                <label htmlFor="skill-search-input" className="sr-only">搜索技能</label>
+                <Search className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-500 transition-colors" />
                 <input
+                    id="skill-search-input"
                     type="text"
-                    placeholder="Search by name, description, author, or tag..."
+                    placeholder="按名称、描述、作者或标签搜索..."
                     value={searchTerm}
                     onChange={(event) => setSearchTerm(event.target.value)}
-                    className="w-full ui-input pl-12 pr-4 py-4 focus:ring-4 focus:ring-brand/10 placeholder:text-text-muted"
+                    className="w-full bg-bg-base border border-border-main rounded-[calc(var(--radius-base))] pl-14 pr-4 py-4 text-sm leading-6 text-text-main placeholder:text-text-muted focus:border-brand/50 focus:ring-4 focus:ring-brand/10 transition-all"
                 />
             </div>
 
             {activeTab === 'discover' && isFetchingAwesome ? (
                 <div className="themed-panel h-64 flex flex-col items-center justify-center border-dashed">
                     <div className="w-8 h-8 rounded-full border-2 border-brand border-t-transparent animate-spin mb-4" />
-                    <p className="ui-kicker font-mono">Loading discover feeds...</p>
+                    <p className="ui-kicker font-mono">正在加载发现列表...</p>
                 </div>
             ) : filteredSkills.length === 0 ? (
                 <div className="themed-panel h-64 flex flex-col items-center justify-center border-dashed">
-                    <p className="text-text-muted text-lg leading-7 mb-4">No skills found.</p>
+                    <p className="text-text-muted text-lg leading-7 mb-4">未找到匹配技能。</p>
                     <button
                         onClick={() => setSearchTerm('')}
                         className="text-brand hover:text-text-main transition-colors underline underline-offset-4"
                     >
-                        Clear search
+                        清空搜索
                     </button>
                 </div>
             ) : (
@@ -844,12 +870,12 @@ echo "Installed ${safeSkillFolder} into $TARGET_DIR"
                                     <h3 className="text-xl font-bold text-text-main line-clamp-1 flex-1 pr-2">{skill.name}</h3>
                                     {activeTab === 'local' && skill.pinnedAt && (
                                         <span className="ui-pill ui-pill-warning mr-2">
-                                            Pinned
+                                            已置顶
                                         </span>
                                     )}
                                     {activeTab === 'local' && currentTime - skill.createdAt < 24 * 60 * 60 * 1000 && (
                                         <span className="ui-pill ui-pill-brand mr-2 animate-pulse">
-                                            New
+                                            新
                                         </span>
                                     )}
 
@@ -857,17 +883,18 @@ echo "Installed ${safeSkillFolder} into $TARGET_DIR"
                                         {activeTab === 'local' ? (
                                             <>
                                                 <div className="relative">
-                                                    <button
-                                                        onClick={(event) => {
-                                                            event.stopPropagation();
-                                                            setActiveDropdown(activeDropdown === skill.id ? null : skill.id);
-                                                        }}
-                                                        aria-haspopup="menu"
-                                                        aria-expanded={activeDropdown === skill.id}
-                                                        aria-controls={`install-menu-${skill.id}`}
-                                                        title="Install to project"
-                                                        className="ui-icon-btn text-text-muted hover:text-blue-400 bg-bg-base hover:bg-blue-400/10"
-                                                    >
+                                                        <button
+                                                            onClick={(event) => {
+                                                                event.stopPropagation();
+                                                                setActiveDropdown(activeDropdown === skill.id ? null : skill.id);
+                                                            }}
+                                                            aria-haspopup="menu"
+                                                            aria-expanded={activeDropdown === skill.id}
+                                                            aria-controls={`install-menu-${skill.id}`}
+                                                            aria-label={`安装 ${skill.name} 到项目目录`}
+                                                            title="安装到项目目录"
+                                                            className="ui-icon-btn text-text-muted hover:text-blue-400 bg-bg-base hover:bg-blue-400/10"
+                                                        >
                                                         <FolderSymlink className="w-4 h-4" />
                                                     </button>
                                                     {activeDropdown === skill.id && (
@@ -875,7 +902,8 @@ echo "Installed ${safeSkillFolder} into $TARGET_DIR"
                                                             ref={dropdownRef}
                                                             id={`install-menu-${skill.id}`}
                                                             role="menu"
-                                                            aria-label={`Install ${skill.name} to target`}
+                                                            tabIndex={-1}
+                                                            aria-label={`为 ${skill.name} 选择安装目标`}
                                                             onKeyDown={(event) => {
                                                                 if (event.key === 'Escape') {
                                                                     event.preventDefault();
@@ -885,7 +913,7 @@ echo "Installed ${safeSkillFolder} into $TARGET_DIR"
                                                             className="absolute right-0 top-full mt-2 w-60 bg-bg-panel border border-border-main rounded-xl shadow-2xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200"
                                                         >
                                                             <div className="px-3 py-2 border-b border-border-main ui-kicker">
-                                                                Install target
+                                                                安装目标
                                                             </div>
                                                             <div className="py-1 max-h-64 overflow-y-auto custom-scrollbar">
                                                                 {SKILL_INSTALL_TARGETS.map((target) => (
@@ -905,28 +933,32 @@ echo "Installed ${safeSkillFolder} into $TARGET_DIR"
                                                 </div>
                                                 <button
                                                     onClick={() => handleTogglePin(skill)}
-                                                    title={skill.pinnedAt ? 'Unpin' : 'Pin to top'}
+                                                    aria-label={skill.pinnedAt ? `取消置顶 ${skill.name}` : `置顶 ${skill.name}`}
+                                                    title={skill.pinnedAt ? '取消置顶' : '置顶'}
                                                     className="ui-icon-btn text-text-muted hover:text-amber-400 bg-bg-base hover:bg-amber-400/10"
                                                 >
                                                     {skill.pinnedAt ? <PinOff className="w-4 h-4" /> : <Pin className="w-4 h-4" />}
                                                 </button>
                                                 <button
                                                     onClick={() => handleExportScript(skill)}
-                                                    title="Export install script"
+                                                    aria-label={`导出 ${skill.name} 的安装脚本`}
+                                                    title="导出安装脚本"
                                                     className="ui-icon-btn text-text-muted hover:text-green-400 bg-bg-base hover:bg-green-400/10"
                                                 >
                                                     <Download className="w-4 h-4" />
                                                 </button>
                                                 <button
                                                     onClick={() => navigate(`/editor?id=${skill.id}`)}
-                                                    title="Edit"
+                                                    aria-label={`编辑 ${skill.name}`}
+                                                    title="编辑"
                                                     className="ui-icon-btn text-text-muted hover:text-brand bg-bg-base hover:bg-brand/10"
                                                 >
                                                     <Edit className="w-4 h-4" />
                                                 </button>
                                                 <button
                                                     onClick={() => deleteSkill(skill.id)}
-                                                    title="Delete"
+                                                    aria-label={`删除 ${skill.name}`}
+                                                    title="删除"
                                                     className="ui-icon-btn text-text-muted hover:text-red-400 bg-bg-base hover:bg-red-400/10"
                                                 >
                                                     <Trash2 className="w-4 h-4" />
@@ -938,25 +970,25 @@ echo "Installed ${safeSkillFolder} into $TARGET_DIR"
                                                 disabled={isInstalled || isBlocked}
                                                 title={
                                                     isInstalled
-                                                        ? 'Already installed in local library'
+                                                        ? '已安装到本地技能库'
                                                         : isComplianceBlocked
-                                                            ? installCompliance?.message || 'Blocked by compliance policy'
+                                                            ? installCompliance?.message || '已被合规策略拦截'
                                                             : skill.security?.hardTriggered
-                                                                ? 'Blocked by security policy'
+                                                                ? '已被安全策略拦截'
                                                                 : installCompliance?.decision === 'warn'
-                                                                    ? `${installCompliance.message} (manual review recommended)`
-                                                                    : 'Install into local library'
+                                                                    ? `${installCompliance.message}（建议人工复核）`
+                                                                    : '安装到本地技能库'
                                                 }
-                                                className="ui-btn-primary text-bg-base px-3 py-1.5 text-xs"
+                                                className="ui-btn-primary px-3 py-1.5 text-xs"
                                             >
                                                 {isInstalled ? (
-                                                    'Installed'
+                                                    '已安装'
                                                 ) : isBlocked ? (
-                                                    'Blocked'
+                                                    '已拦截'
                                                 ) : (
                                                     <>
                                                         <PlusCircle className="w-3.5 h-3.5" />
-                                                        Install
+                                                        安装
                                                     </>
                                                 )}
                                             </button>
@@ -965,7 +997,7 @@ echo "Installed ${safeSkillFolder} into $TARGET_DIR"
                                 </div>
 
                                 <p className="ui-body-sm mb-6 line-clamp-3 flex-1 relative z-10">
-                                    {skill.description || 'No description.'}
+                                    {skill.description || '暂无描述。'}
                                 </p>
 
                                 <div className="mt-auto space-y-3 relative z-10 border-t border-border-main pt-4">
@@ -974,12 +1006,12 @@ echo "Installed ${safeSkillFolder} into $TARGET_DIR"
                                             {activeTab === 'discover' && (
                                                 <span className={`ui-badge ${getTrustBadgeClass(sourceTrust)}`}>
                                                     <ShieldAlert className="w-3 h-3" />
-                                                    Trust {sourceTrust.score}
+                                                    信任 {sourceTrust.score}
                                                 </span>
                                             )}
                                             {activeTab === 'discover' && installCompliance?.decision === 'warn' && (
                                                 <span className="ui-badge ui-badge-attention">
-                                                    Review source
+                                                    复核来源
                                                 </span>
                                             )}
                                             {securityBadge && (
@@ -993,7 +1025,7 @@ echo "Installed ${safeSkillFolder} into $TARGET_DIR"
                                             {skill.context === 'fork' && (
                                                 <span className="ui-badge ui-badge-info">
                                                     <Bot className="w-3 h-3" />
-                                                    Subagent: {skill.agent || 'Default'}
+                                                    子代理：{skill.agent || '默认'}
                                                 </span>
                                             )}
                                             {skill.allowedTools?.slice(0, 2).map((tool) => (
@@ -1002,12 +1034,12 @@ echo "Installed ${safeSkillFolder} into $TARGET_DIR"
                                                     className="ui-badge ui-badge-warning"
                                                 >
                                                     <ShieldAlert className="w-3 h-3" />
-                                                    {tool}
+                                                    {getToolDisplayLabel(tool)}
                                                 </span>
                                             ))}
                                             {(skill.allowedTools?.length || 0) > 2 && (
                                                 <span className="ui-badge ui-badge-attention">
-                                                    +{(skill.allowedTools?.length || 0) - 2} tools
+                                                    +{(skill.allowedTools?.length || 0) - 2} 个工具
                                                 </span>
                                             )}
                                         </div>
@@ -1037,13 +1069,13 @@ echo "Installed ${safeSkillFolder} into $TARGET_DIR"
                                             {typeof sourceMetadata.stargazersCount === 'number' && (
                                                 <span className="ui-badge ui-badge-info">
                                                     <Star className="w-3 h-3" />
-                                                    {formatCompactCount(sourceMetadata.stargazersCount)} stars
+                                                    {formatCompactCount(sourceMetadata.stargazersCount)} 星标
                                                 </span>
                                             )}
                                             {typeof sourceMetadata.forksCount === 'number' && (
                                                 <span className="ui-badge ui-badge-info">
                                                     <GitFork className="w-3 h-3" />
-                                                    {formatCompactCount(sourceMetadata.forksCount)} forks
+                                                    {formatCompactCount(sourceMetadata.forksCount)} 分叉
                                                 </span>
                                             )}
                                             {sourceMetadata.license && (
@@ -1055,7 +1087,7 @@ echo "Installed ${safeSkillFolder} into $TARGET_DIR"
                                             {hasSourceUpdatedAt && (
                                                 <span className="ui-badge ui-badge-info">
                                                     <Clock className="w-3 h-3" />
-                                                    Updated {formatDistanceToNow(new Date(sourceUpdatedAt || ''), { addSuffix: true })}
+                                                    更新于 {formatRelativeTime(sourceUpdatedAt || '')}
                                                 </span>
                                             )}
                                         </div>
@@ -1065,11 +1097,11 @@ echo "Installed ${safeSkillFolder} into $TARGET_DIR"
                                         <span className="flex items-center gap-1.5">
                                             <Clock className="w-3.5 h-3.5" />
                                             {activeTab === 'local'
-                                                ? formatDistanceToNow(skill.createdAt, { addSuffix: true })
-                                                : 'Discover feed'}
+                                                ? formatRelativeTime(skill.createdAt)
+                                                : '发现流'}
                                         </span>
                                         <span className="font-medium text-text-muted line-clamp-1 text-right max-w-[50%]">
-                                            {skill.author || 'Unknown'}
+                                            {skill.author || '未知作者'}
                                         </span>
                                     </div>
                                 </div>

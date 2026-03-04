@@ -1,16 +1,15 @@
 import React, { useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { Library, PenTool, PlayCircle, Rocket, Settings, Unlink } from 'lucide-react';
+import { Library, PenTool, PlayCircle, Settings, Unlink } from 'lucide-react';
 import { Logo } from './Logo';
 import { cn } from '../lib/utils';
 import { useSkillStore } from '../store';
 
 const navItems = [
-    { icon: Library, label: 'Skill Library', path: '/' },
-    { icon: PenTool, label: 'Forge Editor', path: '/editor' },
-    { icon: PlayCircle, label: 'Simulator', path: '/simulator' },
-    { icon: Settings, label: 'Settings', path: '/settings' },
-    { icon: Rocket, label: 'Launch Pages', path: '/promo' },
+    { icon: Library, label: '技能库', path: '/' },
+    { icon: PenTool, label: '技能编辑', path: '/editor' },
+    { icon: PlayCircle, label: '模拟器', path: '/simulator' },
+    { icon: Settings, label: '设置', path: '/settings' },
 ];
 
 type SidebarProps = {
@@ -39,13 +38,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ className, onNavigate }) => {
                 </div>
                 <div>
                     <h1 className="text-lg font-bold text-text-main leading-tight tracking-[-0.01em]">
-                        Skill Forge
+                        技能工坊
                     </h1>
-                    <p className="ui-kicker mt-1">AI Agent Tools</p>
+                    <p className="ui-kicker mt-1">AI 智能体工具</p>
                 </div>
             </div>
 
-            <nav className="flex-1 px-4 py-4 space-y-2 overflow-y-auto" aria-label="Primary navigation">
+            <nav className="flex-1 px-4 py-4 space-y-2 overflow-y-auto" aria-label="主导航">
                 {navItems.map((item) => (
                     <NavLink
                         key={item.path}
@@ -80,7 +79,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ className, onNavigate }) => {
                     <div className="themed-panel p-4 border-green-500/20 bg-green-500/5 text-center">
                         <div className="flex items-center justify-center gap-1 mb-1">
                             <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                            <p className="ui-kicker text-green-400">System Linked</p>
+                            <p className="ui-kicker text-green-400">目录已连接</p>
                         </div>
                         <p className="ui-caption font-mono truncate px-2">{dirHandle.name}</p>
                     </div>
@@ -95,9 +94,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ className, onNavigate }) => {
                     >
                         <div className="flex items-center justify-center gap-1 mb-1">
                             <Unlink className="w-3 h-3 text-brand" />
-                            <p className="ui-kicker text-brand">Local Only</p>
+                            <p className="ui-kicker text-brand">仅本地</p>
                         </div>
-                        <p className="ui-caption group-hover:text-brand transition-colors">Click to link system dir</p>
+                        <p className="ui-caption group-hover:text-brand transition-colors">点击前往设置连接目录</p>
                     </button>
                 )}
             </div>
