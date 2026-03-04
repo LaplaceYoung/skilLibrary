@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '../lib/utils';
-import { useSkillStore, type BackgroundMotionMode, type ThemeType } from '../store';
+import { useSkillStore, type ThemeType } from '../store';
 
 type CommandSection = '导航' | '动作';
 
@@ -33,7 +33,6 @@ type CommandPaletteProps = {
 };
 
 const THEMES: ThemeType[] = ['geometric', 'chromatic', 'organic'];
-const BACKGROUND_MOTION_MODES: BackgroundMotionMode[] = ['auto', 'on', 'off'];
 const COMMAND_USAGE_STORAGE_KEY = 'agent-skill-forge-command-usage-v1';
 const MAX_RECENT_COMMANDS = 12;
 
@@ -41,12 +40,6 @@ const THEME_LABELS: Record<ThemeType, string> = {
     geometric: '几何流光',
     chromatic: '色谱共振',
     organic: '有机递归'
-};
-
-const BACKGROUND_MOTION_MODE_LABELS: Record<BackgroundMotionMode, string> = {
-    auto: '自动',
-    on: '开启',
-    off: '关闭'
 };
 
 type CommandUsageState = {
@@ -134,9 +127,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ open, onClose })
         syncFromLocal,
         addToast,
         setTheme,
-        activeTheme,
-        backgroundMotionMode,
-        setBackgroundMotionMode
+        activeTheme
     } = useSkillStore();
     const [query, setQuery] = useState('');
     const [activeIndex, setActiveIndex] = useState(0);
@@ -212,21 +203,6 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ open, onClose })
                     addToast(`主题已切换为 ${THEME_LABELS[nextTheme]}。`, 'success');
                     onClose();
                 }
-            },
-            {
-                id: 'background-motion-cycle',
-                title: '切换背景动态',
-                subtitle: `当前：${BACKGROUND_MOTION_MODE_LABELS[backgroundMotionMode]}`,
-                section: '动作',
-                keywords: ['背景', '动态', '动画', '性能'],
-                icon: Sparkles,
-                run: () => {
-                    const currentIndex = BACKGROUND_MOTION_MODES.indexOf(backgroundMotionMode);
-                    const nextMode = BACKGROUND_MOTION_MODES[(currentIndex + 1) % BACKGROUND_MOTION_MODES.length];
-                    setBackgroundMotionMode(nextMode);
-                    addToast(`背景动态模式已设为 ${BACKGROUND_MOTION_MODE_LABELS[nextMode]}。`, 'success');
-                    onClose();
-                }
             }
         ];
 
@@ -263,11 +239,9 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ open, onClose })
     }, [
         activeTheme,
         addToast,
-        backgroundMotionMode,
         dirHandle,
         navigate,
         onClose,
-        setBackgroundMotionMode,
         setTheme,
         syncFromLocal
     ]);
