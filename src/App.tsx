@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Navigate, Outlet, Route, Routes } from 'react-
 import { Layout } from './components/Layout';
 import { ToastProvider } from './components/Toast';
 import { useSkillStore, type Skill } from './store';
+import { PromoLocaleProvider } from './pages/promo/promoLocale';
 
 const Library = lazy(() => import('./pages/Library').then((module) => ({ default: module.Library })));
 const SkillEditor = lazy(() => import('./pages/SkillEditor').then((module) => ({ default: module.SkillEditor })));
@@ -25,6 +26,12 @@ const WorkspaceFrame = () => (
   <Layout>
     <Outlet />
   </Layout>
+);
+
+const PromoFrame = () => (
+  <PromoLocaleProvider>
+    <PromoShell />
+  </PromoLocaleProvider>
 );
 
 const routerBasename = import.meta.env.BASE_URL === '/' ? undefined : import.meta.env.BASE_URL.replace(/\/$/, '');
@@ -100,7 +107,7 @@ function App() {
     <Router basename={routerBasename}>
       <Suspense fallback={<RouteSkeleton />}>
         <Routes>
-          <Route path="/promo" element={<PromoShell />}>
+          <Route path="/promo" element={<PromoFrame />}>
             <Route index element={<PromoOverview />} />
             <Route path="growth" element={<PromoGrowth />} />
             <Route path="benchmarks" element={<PromoBenchmarks />} />

@@ -1,122 +1,102 @@
-﻿import React from 'react';
-import { ArrowRight, CheckCircle2, Compass, ShieldCheck, Sparkles, Workflow } from 'lucide-react';
+import React from 'react';
+import { ArrowRight, Github, ShieldCheck, Sparkles, Workflow } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { trackPromoEvent } from '../../lib/promoAnalytics';
+import { usePromoLocale } from './promoLocale';
 
-const engineCards = [
-  {
-    title: 'Assetize Skills',
-    icon: Compass,
-    description: '将零散提示词转成结构化资产：frontmatter、instructions、attachments。',
-  },
-  {
-    title: 'Govern Before Action',
-    icon: ShieldCheck,
-    description: '保存/导入/安装/导出前执行安全扫描与策略门禁，控制高风险行为。',
-  },
-  {
-    title: 'Distribute to Many Agents',
-    icon: Workflow,
-    description: '同一份 skill 可安装到 .claude/.codex/.cursor/.windsurf/.github/.gemini。',
-  },
-  {
-    title: 'Close the Learning Loop',
-    icon: Sparkles,
-    description: '通过 Simulator、审计日志与命令面板高频迭代，提高可复用率与转化率。',
-  },
-];
-
-const kpis = [
-  { value: '6+', label: '主流 Agent 生态可安装' },
-  { value: '4', label: '关键动作合规闸口' },
-  { value: '11 + 4', label: 'Smoke + A11y E2E 已落地' },
-  { value: 'Local-first', label: '本地优先 + MCP 可扩展' },
+const highlights = [
+  { title: { en: 'Policy-first', zh: '合规优先' }, detail: { en: 'Guarded delivery', zh: '有闸门的交付' } },
+  { title: { en: 'Reusable units', zh: '可复用单元' }, detail: { en: 'Skills as assets', zh: '技能即资产' } },
+  { title: { en: 'Multi-agent', zh: '多代理分发' }, detail: { en: 'One skill, many runtimes', zh: '一份技能，多端运行' } },
 ];
 
 export const PromoOverview: React.FC = () => {
+  const { locale } = usePromoLocale();
+  const isEnglish = locale === 'en';
+
   return (
-    <div className="space-y-8 sm:space-y-10 ui-page-enter">
-      <section className="promo-panel p-6 sm:p-10 lg:p-12">
-        <div className="grid gap-8 lg:grid-cols-[minmax(0,1.1fr),minmax(0,0.9fr)] lg:items-end">
-          <div className="space-y-5">
-            <p className="ui-kicker text-brand">Product Positioning</p>
-            <h1 className="text-4xl font-black leading-tight tracking-[-0.02em] text-text-main sm:text-5xl lg:text-6xl">
-              把 Agent Skill
-              <br />
-              从“仓库收藏”升级成
-              <span className="text-brand">可增长产品</span>
-            </h1>
-            <p className="max-w-2xl text-base leading-7 text-text-muted sm:text-lg">
-              Agent Skill Forge 面向 AI 产品和平台团队：让 skill 具备可编辑、可验证、可安装、可传播的完整闭环，
-              让每一次能力沉淀都能带来下一次增长裂变。
+    <div className="space-y-8 sm:space-y-10 promo-fade-in">
+      <section className="promo-surface promo-float rounded-[28px] p-7 sm:p-10 lg:p-14">
+        <div className="grid gap-8 lg:grid-cols-[minmax(0,1.2fr),minmax(0,0.8fr)] lg:items-end">
+          <div className="space-y-6 promo-stagger">
+            <p className="promo-reveal text-xs uppercase tracking-[0.18em] text-[#d7a768]">
+              {isEnglish ? 'Agent Skill Operating System' : '技能操作系统'}
             </p>
-            <div className="flex flex-wrap items-center gap-3">
-              <Link to="/editor" className="ui-btn-primary px-5 py-3 text-sm sm:text-base">
-                立即创建增长技能
+            <h1 className="promo-reveal text-4xl font-semibold leading-[1.03] tracking-[-0.03em] text-[#f9f6ef] sm:text-6xl">
+              {isEnglish ? 'Ship skills. Governed.' : '技能交付，先有闸门。'}
+            </h1>
+            <p className="promo-reveal max-w-2xl text-sm leading-7 text-[#cbc3b4] sm:text-base">
+              {isEnglish
+                ? 'Edit, simulate, govern, distribute. One flow for durable skill delivery.'
+                : '编辑·模拟·合规·分发，一体化交付流程。'}
+            </p>
+            <div className="promo-reveal flex flex-wrap gap-3">
+              <a
+                href="https://github.com/LaplaceYoung/skilLibrary"
+                target="_blank"
+                rel="noreferrer"
+                onClick={() => trackPromoEvent('promo_cta_github', 'promo-overview')}
+                className="ui-btn-primary rounded-full px-6 py-3 text-sm"
+              >
+                <Github className="h-4 w-4" />
+                {isEnglish ? 'Star / Fork' : 'Star / Fork'}
+              </a>
+              <Link to="growth" className="ui-btn-secondary rounded-full px-6 py-3 text-sm">
+                {isEnglish ? 'Explore Flow' : '查看流程'}
                 <ArrowRight className="h-4 w-4" />
-              </Link>
-              <Link to="/promo/growth" className="ui-btn-secondary px-5 py-3 text-sm sm:text-base">
-                查看裂变增长引擎
               </Link>
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-3 sm:gap-4">
-            {kpis.map((kpi) => (
-              <div key={kpi.label} className="rounded-[var(--radius-base)] border border-border-main bg-bg-action/60 p-4 sm:p-5">
-                <p className="text-2xl font-black tracking-tight text-brand sm:text-3xl">{kpi.value}</p>
-                <p className="mt-1 text-xs leading-5 text-text-muted sm:text-sm">{kpi.label}</p>
-              </div>
-            ))}
+          <div className="grid grid-cols-1 gap-3">
+            <div className="promo-stat-card rounded-2xl border border-white/15 bg-[#14120d]/70 p-5">
+              <p className="text-xs uppercase tracking-[0.16em] text-[#9f9787]">{isEnglish ? 'Policy Gates' : '策略闸门'}</p>
+              <p className="mt-2 text-3xl font-semibold text-[#ffe2b8]">Policy</p>
+            </div>
+            <div className="promo-stat-card rounded-2xl border border-white/15 bg-[#14120d]/70 p-5">
+              <p className="text-xs uppercase tracking-[0.16em] text-[#9f9787]">{isEnglish ? 'Install Targets' : '安装目标'}</p>
+              <p className="mt-2 text-3xl font-semibold text-[#ffe2b8]">Multi</p>
+            </div>
           </div>
         </div>
       </section>
 
-      <section className="space-y-4">
-        <div className="flex items-center justify-between gap-3">
-          <h2 className="text-2xl font-black tracking-tight sm:text-3xl">能力裂变引擎</h2>
-          <span className="ui-badge ui-badge-brand">From idea to install</span>
-        </div>
-        <div className="grid gap-4 sm:grid-cols-2">
-          {engineCards.map((card) => (
-            <article key={card.title} className="promo-panel p-5 sm:p-6">
-              <div className="mb-3 inline-flex rounded-[var(--radius-button)] border border-brand/30 bg-brand/10 p-2 text-brand">
-                <card.icon className="h-5 w-5" />
-              </div>
-              <h3 className="text-lg font-bold leading-6 text-text-main">{card.title}</h3>
-              <p className="mt-2 text-sm leading-6 text-text-muted">{card.description}</p>
-            </article>
-          ))}
+      <section className="promo-surface rounded-2xl p-5 sm:p-6">
+        <p className="text-xs uppercase tracking-[0.16em] text-[#d7a768]">
+          {isEnglish ? 'System Signals' : '系统信号'}
+        </p>
+        <div className="mt-3 grid gap-3 sm:grid-cols-3">
+          <article className="rounded-xl border border-white/10 bg-[#14120d]/70 p-4">
+            <p className="text-xs uppercase tracking-[0.12em] text-[#9e9585]">{isEnglish ? 'Governance' : '治理'}</p>
+            <p className="mt-2 text-2xl font-semibold text-[#ffe2b8]">{isEnglish ? 'Policy + Audit' : '策略 + 审计'}</p>
+          </article>
+          <article className="rounded-xl border border-white/10 bg-[#14120d]/70 p-4">
+            <p className="text-xs uppercase tracking-[0.12em] text-[#9e9585]">{isEnglish ? 'Simulation' : '模拟'}</p>
+            <p className="mt-2 text-2xl font-semibold text-[#ffe2b8]">{isEnglish ? 'Scenario Run' : '场景回放'}</p>
+          </article>
+          <article className="rounded-xl border border-white/10 bg-[#14120d]/70 p-4">
+            <p className="text-xs uppercase tracking-[0.12em] text-[#9e9585]">{isEnglish ? 'Distribution' : '分发'}</p>
+            <p className="mt-2 text-2xl font-semibold text-[#ffe2b8]">{isEnglish ? 'Multi-agent' : '多代理'}</p>
+          </article>
         </div>
       </section>
 
-      <section className="promo-panel p-6 sm:p-8">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <p className="ui-kicker">Value Narrative</p>
-            <p className="mt-2 text-base leading-7 text-text-muted">
-              对外讲“分发效率”，对内讲“合规与可维护性”，让研发、产品、运营都能在同一套 skill 工具链里协作。
+      <section className="grid gap-4 md:grid-cols-3">
+        {highlights.map((item, index) => (
+          <article key={item.title.en} className="promo-surface promo-card-glow rounded-2xl p-5">
+            <div className="mb-3 inline-flex rounded-full border border-[#f4b367]/50 bg-[#f4b367]/15 p-2 text-[#ffcc8f]">
+              {index === 0 && <ShieldCheck className="h-4 w-4" />}
+              {index === 1 && <Sparkles className="h-4 w-4" />}
+              {index === 2 && <Workflow className="h-4 w-4" />}
+            </div>
+            <h2 className="text-lg font-semibold tracking-[-0.01em] text-[#f6f2e9]">
+              {isEnglish ? item.title.en : item.title.zh}
+            </h2>
+            <p className="mt-2 text-sm leading-6 text-[#bbb2a2]">
+              {isEnglish ? item.detail.en : item.detail.zh}
             </p>
-          </div>
-          <Link to="/promo/benchmarks" className="ui-btn-secondary px-4 py-2.5 text-sm">
-            查看同类仓库对标
-          </Link>
-        </div>
-        <div className="mt-5 grid gap-3 sm:grid-cols-2">
-          <div className="rounded-[var(--radius-base)] border border-emerald-400/25 bg-emerald-500/8 p-4">
-            <p className="inline-flex items-center gap-2 text-sm font-semibold text-emerald-300">
-              <CheckCircle2 className="h-4 w-4" />
-              面向面试叙事
-            </p>
-            <p className="mt-1 text-xs leading-5 text-emerald-200/80">可直接映射 AI 产品岗位：能力资产化、工作流标准化、交付可验证。</p>
-          </div>
-          <div className="rounded-[var(--radius-base)] border border-sky-400/25 bg-sky-500/8 p-4">
-            <p className="inline-flex items-center gap-2 text-sm font-semibold text-sky-300">
-              <CheckCircle2 className="h-4 w-4" />
-              面向业务增长
-            </p>
-            <p className="mt-1 text-xs leading-5 text-sky-200/80">可扩展至模板市场、团队协作、私域知识注入与分发转化漏斗。</p>
-          </div>
-        </div>
+          </article>
+        ))}
       </section>
     </div>
   );
