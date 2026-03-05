@@ -11,9 +11,9 @@ export const PromoShell: React.FC = () => {
   const { locale, setLocale } = usePromoLocale();
   const isEnglish = locale === 'en';
   const navItems = [
-    { to: '/', label: isEnglish ? 'Overview' : '总览', end: true },
-    { to: '/growth', label: isEnglish ? 'Workflow' : '流程' },
-    { to: '/benchmarks', label: isEnglish ? 'Govern' : '治理' },
+    { to: '.', label: isEnglish ? 'Overview' : '总览', end: true },
+    { to: 'growth', label: isEnglish ? 'Workflow' : '流程' },
+    { to: 'benchmarks', label: isEnglish ? 'Govern' : '治理' },
   ];
 
   return (
@@ -28,7 +28,7 @@ export const PromoShell: React.FC = () => {
 
       <header className="promo-header">
         <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-5 py-4 sm:px-8">
-          <Link to="/" className="inline-flex items-center gap-3">
+          <Link to="." className="inline-flex items-center gap-3">
             <div className="h-10 w-10 rounded-full border border-black/10 bg-white/80 text-center text-[11px] font-semibold leading-10 tracking-[0.2em] text-black">
               ASF
             </div>
