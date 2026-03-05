@@ -1,5 +1,5 @@
 ﻿import { Suspense, lazy, useEffect } from 'react';
-import { BrowserRouter as Router, Outlet, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Navigate, Outlet, Route, Routes } from 'react-router-dom';
 import { Layout } from './components/Layout';
 import { ToastProvider } from './components/Toast';
 import { useSkillStore, type Skill } from './store';
@@ -28,6 +28,13 @@ const WorkspaceFrame = () => (
 );
 
 const routerBasename = import.meta.env.BASE_URL === '/' ? undefined : import.meta.env.BASE_URL.replace(/\/$/, '');
+const isPagesRuntime = (() => {
+  if (import.meta.env.BASE_URL !== '/') return true;
+  if (typeof window === 'undefined') return false;
+  const host = window.location.hostname.toLowerCase();
+  if (host.endsWith('github.io')) return true;
+  return window.location.pathname.startsWith('/skilLibrary/');
+})();
 
 const INITIAL_SKILLS: Skill[] = [
   {
@@ -100,11 +107,11 @@ function App() {
           </Route>
 
           <Route element={<WorkspaceFrame />}>
-            <Route path="/" element={<Library />} />
+            <Route path="/" element={isPagesRuntime ? <Navigate to="/promo" replace /> : <Library />} />
             <Route path="/editor" element={<SkillEditor />} />
             <Route path="/simulator" element={<Simulator />} />
             <Route path="/settings" element={<Settings />} />
-            <Route path="*" element={<Library />} />
+            <Route path="*" element={isPagesRuntime ? <Navigate to="/promo" replace /> : <Library />} />
           </Route>
         </Routes>
       </Suspense>

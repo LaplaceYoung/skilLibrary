@@ -5,6 +5,25 @@
     <link rel="icon" type="image/svg+xml" href="/logo.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Agent Skill Forge</title>
+    <script>
+      (function () {
+        try {
+          var host = window.location.hostname.toLowerCase();
+          var path = window.location.pathname || "/";
+          if (host.endsWith("github.io") || path.indexOf("/skilLibrary/") === 0) {
+            if (path.indexOf("/promo") === -1) {
+              var parts = path.split("/").filter(Boolean);
+              var repo = parts.length ? parts[0] : "";
+              var base = repo ? "/" + repo : "";
+              var target = base + "/promo";
+              window.location.replace(target + window.location.search + window.location.hash);
+            }
+          }
+        } catch (e) {
+          // ignore redirect failures
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>
